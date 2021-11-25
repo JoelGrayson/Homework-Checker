@@ -13,6 +13,7 @@
                 "src/jquery.min.js",
                 "content script.js"
             ],
+            "css": ["check off.css"],
             "run_at": "document_end"
         }
     ],
