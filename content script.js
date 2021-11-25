@@ -11,9 +11,16 @@ function checkIfSchoologyCalendarPage() { //checks if page is a schoology calend
     const urlHasCalendar=window.location.href.includes('calendar');
     if (hasSchoologyScripts && hasCalendar && urlHasCalendar) {
         console.log('2. Page is schoology');
+
+        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js
+            if (msg.run==='reload')
+                location.reload();
+        });
+
         waitForEventsLoaded();
     }
 }
+
 //Resize event listener
 function waitForEventsLoaded() { //waits for calendar's events to load before calling next
     let checkIfEventsLoaded=setInterval(()=>{
@@ -21,48 +28,83 @@ function waitForEventsLoaded() { //waits for calendar's events to load before ca
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
             console.log('3. Add checkmarks');
-            addCheckmarks();
+            checkmarks();
         } else {
             console.log('Still waiting for calendar events to load');
         }
     }, 200);
 }
 
+function checkmarks() { //adds checkmarks to every calendar event
+    function addCheckmarks() {
+        jQuery(window).off('resize'); //prevent from resizing (does not work for some reason)
+        
+        const assignmentsContainer=document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode;
+        let children=assignmentsContainer.children;
+        for (let i=0; i<children.length; i++) {
+            let assignment=children[i];
+            let checkEl=document.createElement('input');
+            checkEl.className='j_check';
+            checkEl.type='checkbox';
+            // checkEl.checked
+            checkEl.addEventListener('change', ()=>{
+                j_check(assignment)
+            });
+            jQuery(checkEl).on('click', e=>{ //prevent assignment dialog from opening when clicking checkmark
+                e.stopPropagation();
+            });
+            assignment.appendChild(checkEl);
+        }
+    }
+    addCheckmarks();
 
-function addCheckmarks() { //manipulates calendar's events
-    jQuery(window).off('resize'); //prevent from resizing (does not work for some reason)
-    
-    const assignmentsContainer=document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode;
-    let children=assignmentsContainer.children;
-    for (let i=0; i<children.length; i++) {
-        let assignment=children[i];
-        let checkEl=document.createElement('input');
-        checkEl.className='j_check';
-        checkEl.type='checkbox';
-        // checkEl.checked
-        checkEl.addEventListener('change', ()=>{
-            let pHighlight=assignment.querySelector('.highlight-green');
-            if (pHighlight==null) { //no higlight green already
-                let highlightGreen=document.createElement('div');
-                highlightGreen.className='highlight-green';
-                assignment.insertBefore(highlightGreen, assignment.firstChild);
-            } else {
-                assignment.removeChild(pHighlight);
+    //CHECK Assignments Already Completed
+    let checkedTasksGlobal;
+    chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
+        checkedTasksGlobal=checkedTasks;
+        console.log('checkedTasks', checkedTasks);
+        for (let i=0; i<checkedTasks.length; i++) {
+            let [infoEl, blockEl]=getAssignmentByName(checkedTasks[i]);
+            j_check(blockEl, false);
+        }
+    });
+
+    function j_check(assignmentEl, storeInChrome=true) { //checks/unchecks passed in element
+        let pHighlight=assignmentEl.querySelector('.highlight-green');
+        const checkmarkEl=assignmentEl.querySelector('input.j_check');
+        let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
+        if (pHighlight==null) { //no highlight green already
+            console.log(`Checking ${assignmentText}`)
+            //Check
+            checkmarkEl.checked=true;
+            let highlightGreen=document.createElement('div');
+            highlightGreen.className='highlight-green';
+            assignmentEl.insertBefore(highlightGreen, assignmentEl.firstChild);
+           
+            if (storeInChrome) {
+                checkedTasksGlobal.push(assignmentText);
+                updateCheckedTasks();
             }
-        })
-        jQuery(checkEl).on('click', e=>{ //prevent assignment dialog from opening when clicking checkmark
-            e.stopPropagation();
-        });
-        assignment.appendChild(checkEl);
+        } else {
+            console.log(`Unchecking ${assignmentText}`)
+            //Uncheck
+            checkmarkEl.checked=false;
+            assignmentEl.removeChild(pHighlight);
+            
+            checkedTasksGlobal.pop(checkedTasksGlobal.indexOf(assignmentText));
+            updateCheckedTasks();
+        }
     }
 
-    //Selecting an assignment by name
-    let [assignmentEl, eventEl]=getAssignmentByName('An Environmental History View of the Industrial Revolution'); //assignment name (stored in database)
-    eventEl.style.backgroundColor='red';
+    function updateCheckedTasks() { //updates checked tasks in chrome's storage
+        console.log(checkedTasksGlobal);
+        chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
+    }
+
     function getAssignmentByName(assignmentName) { //assignment names stored in database
-        let assignmentEl=jQuery(`span.fc-event-title>span:contains('${assignmentName}')`)[0]; //has info (course & event), identifier
-        let eventEl=assignmentEl.parentNode.parentNode.parentNode; //block (has styles)
+        let infoEl=jQuery(`span.fc-event-title>span:contains('${assignmentName}')`)[0]; //has info (course & event), identifier
+        let blockEl=infoEl.parentNode.parentNode.parentNode; //block (has styles)
         
-        return [assignmentEl, eventEl]
+        return [infoEl, blockEl]
     }
 }

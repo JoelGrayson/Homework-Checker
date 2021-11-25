@@ -18,6 +18,7 @@
         }
     ],
     "host_permissions": ["<all_urls>"],
+    "permissions": ["storage"],
     
     "action": {
         "default_popup": "popup.html",
