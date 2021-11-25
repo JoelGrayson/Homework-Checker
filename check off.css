@@ -1,9 +1,15 @@
+/* #fcalendar>div.fc-content>div.fc-view>div>div.fc-event - assignment */
+
 .j_check {
     zoom: 1.2;
     position: absolute;
     right: 1px;
     bottom: 1px;    
     z-index: 11;
+    visibility: hidden; /* all input checks hidden */
+}
+.fc-event:hover .j_check { /* input check shown onhover of assignment */
+    visibility: visible;
 }
 .highlight-green {
     width: 100%;
