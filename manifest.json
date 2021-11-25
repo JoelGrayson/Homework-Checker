@@ -1,0 +1,33 @@
+{
+    "name": "Check Off Schoology Assignments",
+    "description": "Check off assignments in the schoology calendar view.",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content script.js"],
+            "run_at": "document_end"
+        }
+    ],
+    "host_permissions": ["<all_urls>"],
+    
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "./icons/schoology.png",
+            "32": "./icons/schoology.png",
+            "48": "./icons/schoology.png",
+            "128": "./icons/schoology.png"
+        }
+    },
+    "icons": {
+        "16": "./icons/schoology.png",
+        "32": "./icons/schoology.png",
+        "48": "./icons/schoology.png",
+        "128": "./icons/schoology.png"
+    }
+}
