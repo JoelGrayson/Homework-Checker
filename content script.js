@@ -4,7 +4,7 @@
 window.addEventListener('load', checkIfSchoologyCalendarPage, false); //wait for DOM elements to load
 
 function checkIfSchoologyCalendarPage() { //checks if page is a schoology calendar page before calling next
-    jQuery.noConflict();
+    jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
     console.log('1. Extension running');
     const hasSchoologyScripts=document.querySelectorAll('script[src*="schoology.com"]'); //schoology page
     const hasCalendar=document.querySelector('#fcalendar'); //calendar page
@@ -73,6 +73,10 @@ function checkmarks() { //adds checkmarks to every calendar event
         let pHighlight=assignmentEl.querySelector('.highlight-green');
         const checkmarkEl=assignmentEl.querySelector('input.j_check');
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
+        console.log('nodeValue', assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue);
+        console.log('el', assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span'));
+
+
         if (pHighlight==null) { //no highlight green already
             console.log(`Checking ${assignmentText}`)
             //Check
@@ -102,9 +106,24 @@ function checkmarks() { //adds checkmarks to every calendar event
     }
 
     function getAssignmentByName(assignmentName) { //assignment names stored in database
-        let infoEl=jQuery(`span.fc-event-title>span:contains('${assignmentName}')`)[0]; //has info (course & event), identifier
+        let infoEl;
+        let queryRes=jQuery(`span.fc-event-title>span:contains('${assignmentName}')`); //has info (course & event), identifier
+        //jQuery's :contains() will match elements where assignmentName is a substring of the assignment. else if below handles overlaps
+
+        if (queryRes.length===1) //only one matching elements 👍
+            infoEl=queryRes[0];
+        else if (queryRes.length>=2) { //2+ conflicting matches 🤏 (needs processing to find right element)
+            for (let i=0; i<queryRes.length; i++) { //test for every element
+                if (queryRes[i].firstChild.nodeValue===assignmentName) { //if element's assignment title matches assignmentName, that is the right element
+                    infoEl=queryRes[i];
+                    break;
+                }
+            }
+        } else { //returns if no matches 👎
+            console.error(`No elements matched ${assignmentName}`);
+            return 'No matches';
+        }
         let blockEl=infoEl.parentNode.parentNode.parentNode; //block (has styles)
-        
         return [infoEl, blockEl]
     }
 }
