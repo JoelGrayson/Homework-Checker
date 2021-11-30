@@ -1,36 +1,52 @@
 //This script is injected into every page.
 //Functions are in sequential order
 
-window.addEventListener('load', checkIfSchoologyCalendarPage, false); //wait for DOM elements to load
+window.addEventListener('load', checkIfSchoologyCalendarOrCoursePage, false); //wait for DOM elements to load
 
-function checkIfSchoologyCalendarPage() { //checks if page is a schoology calendar page before calling next
-    jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
-    console.log('1. Extension running');
-    const hasSchoologyScripts=document.querySelectorAll('script[src*="schoology.com"]'); //schoology page
-    const hasCalendar=document.querySelector('#fcalendar'); //calendar page
-    const urlHasCalendar=window.location.href.includes('calendar');
-    if (hasSchoologyScripts && hasCalendar && urlHasCalendar) {
-        console.log('2. Page is schoology');
-
-        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js
-            if (msg.run==='reload')
-                location.reload();
-        });
-
-        waitForEventsLoaded();
-    }
+function log(msg) { //logs with schoology icon
+    console.log(`ⓢ`, msg);
 }
 
+function checkIfSchoologyCalendarOrCoursePage() { //checks if page is a schoology calendar page before calling next
+    jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
+    log('1. Extension running');
+    //Calendar
+    const hasSchoologyScripts=document.querySelectorAll('script[src*="schoology.com"]'); //schoology page
+    if (hasSchoologyScripts) {
+        
+        const hasCalendar=document.querySelector('#fcalendar'); //calendar page
+        const urlHasCalendar=window.location.href.includes('calendar');
+        if (hasCalendar && urlHasCalendar) {
+            log('2. Page is schoology calendar');
+            chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js
+                if (msg.run==='reload')
+                location.reload();
+            });
+            waitForEventsLoaded();
+        }
+        //Course page
+        else {
+            let hasCourse=window.location.href.match(/\/course\/(\d+)\//);
+            if (hasCourse) {
+                log('2. Page is schoology material page');
+                let courseId=hasCourse[0];
+
+            }
+        }
+    }
+
+}
+//<h1> CALENDAR
 //Resize event listener
 function waitForEventsLoaded() { //waits for calendar's events to load before calling next
     let checkIfEventsLoaded=setInterval(()=>{
         let calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=3; //more than three assignments on calendar indicating assignments loaded
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
-            console.log('3. Add checkmarks');
+            log('3. Add checkmarks');
             checkmarks();
         } else {
-            console.log('Still waiting for calendar events to load');
+            log('Still waiting for calendar events to load');
         }
     }, 200);
 }
@@ -62,23 +78,25 @@ function checkmarks() { //adds checkmarks to every calendar event
     let checkedTasksGlobal;
     chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
         checkedTasksGlobal=checkedTasks;
-        console.log('checkedTasks', checkedTasks);
-        for (let i=0; i<checkedTasks.length; i++) {
-            let [infoEl, blockEl]=getAssignmentByName(checkedTasks[i]);
-            j_check(blockEl, false);
+        log('checkedTasks'); console.log(checkedTasks);
+        for (let course in checkedTasksGlobal) {
+            let assignments=checkedTasksGlobal[course];
+            for (let i=0; i<assignments.length; i++) {
+                let [infoEl, blockEl]=getAssignmentByName(assignments[i]);
+                j_check(blockEl, false);
+            }
         }
     });
 
     function j_check(assignmentEl, storeInChrome=true) { //checks/unchecks passed in element
+        //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior assignments from storage. is true all other times
         let pHighlight=assignmentEl.querySelector('.highlight-green');
         const checkmarkEl=assignmentEl.querySelector('input.j_check');
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
-        console.log('nodeValue', assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue);
-        console.log('el', assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span'));
-
+        let courseText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title span.realm-title-course').innerText
 
         if (pHighlight==null) { //no highlight green already
-            console.log(`Checking ${assignmentText}`)
+            log(`Checking ${assignmentText}`)
             //Check
             checkmarkEl.checked=true;
             let highlightGreen=document.createElement('div');
@@ -86,11 +104,16 @@ function checkmarks() { //adds checkmarks to every calendar event
             assignmentEl.insertBefore(highlightGreen, assignmentEl.firstChild);
            
             if (storeInChrome) {
-                checkedTasksGlobal.push(assignmentText);
+                if (courseText in checkedTasksGlobal) { //already exists, so append
+                    checkedTasksGlobal[courseText].push(assignmentText);
+                } else { //not exist, so create course log
+                    checkedTasksGlobal[courseText]=[];
+                    checkedTasksGlobal[courseText].push(assignmentText); //push to newly created class
+                }
                 updateCheckedTasks();
             }
         } else {
-            console.log(`Unchecking ${assignmentText}`)
+            log(`Unchecking ${assignmentText}`)
             //Uncheck
             checkmarkEl.checked=false;
             assignmentEl.removeChild(pHighlight);
@@ -101,7 +124,7 @@ function checkmarks() { //adds checkmarks to every calendar event
     }
 
     function updateCheckedTasks() { //updates checked tasks in chrome's storage
-        console.log(checkedTasksGlobal);
+        log(checkedTasksGlobal);
         chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
     }
 
@@ -127,3 +150,5 @@ function checkmarks() { //adds checkmarks to every calendar event
         return [infoEl, blockEl]
     }
 }
+
+//<h1> MATERIAL PAGE
