@@ -94,7 +94,6 @@ function checkmarks() { //adds checkmarks to every calendar event
         const checkmarkEl=assignmentEl.querySelector('input.j_check_cal');
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
         let courseText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title span.realm-title-course').innerText;
-        console.log(courseText);
 
         if (pHighlight==null) { //no highlight green already
             log(`Checking ${assignmentText}`);
@@ -151,7 +150,6 @@ function checkmarks() { //adds checkmarks to every calendar event
     }
 }
 function updateCheckedTasks(checkedTasksGlobal) { //updates checked tasks in chrome's storage
-    console.log(checkedTasksGlobal);
     chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
 }
 
@@ -188,8 +186,6 @@ function materialsPage(courseId) {
             for (let i=0; i<checkedTasksGlobal[courseName].length; i++) {
                 let assignmentName=checkedTasksGlobal[courseName][i];
                 let assignmentEl=getAssignmentByName(assignmentName)
-                console.log('assignmentName', assignmentName);
-                console.log('assignmentEl', assignmentEl);
                 j_check(assignmentEl, false);
             }
         }

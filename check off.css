@@ -6,10 +6,10 @@
     right: 1px;
     bottom: 1px;    
     z-index: 11;
-    visibility: hidden; /* all input checks hidden */
+    /*visibility: hidden; /* all input checks hidden */
 }
 .fc-event:hover .j_check_cal { /* input check shown onhover of assignment */
-    visibility: visible;
+    /* visibility: visible; */
 }
 .highlight-green {
     /* Green & cross through center */
