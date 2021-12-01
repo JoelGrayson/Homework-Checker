@@ -232,9 +232,16 @@ function materialsPage(courseId) {
             checkmarkEl.checked=false;
             assignmentEl.classList.remove('highlight-green');
             
-            // checkedTasksGlobal.pop(checkedTasksGlobal.indexOf(assignmentText));
-            checkedTasksGlobal[courseName].pop(checkedTasksGlobal[courseName].indexOf(assignmentText));
-            updateCheckedTasks(checkedTasksGlobal);
+            try {
+                checkedTasksGlobal[courseName].pop(checkedTasksGlobal[courseName].indexOf(assignmentText));
+                updateCheckedTasks(checkedTasksGlobal);
+            } catch (err) {
+                log(err);
+                setTimeout(()=>{
+                    checkedTasksGlobal[courseName].pop(checkedTasksGlobal[courseName].indexOf(assignmentText));
+                    updateCheckedTasks(checkedTasksGlobal);
+                }, 1000);
+            }
         }
     }
 
