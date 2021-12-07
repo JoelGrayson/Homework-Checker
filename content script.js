@@ -12,25 +12,29 @@ function checkIfSchoologyCalendarOrCoursePage() { //checks if page is a schoolog
     log('1. Extension running');
     //Calendar
     const hasSchoologyScripts=document.querySelectorAll('script[src*="schoology.com"]'); //schoology page
-    if (hasSchoologyScripts) {
-        
+    if (hasSchoologyScripts) { //schoology page (determine which one)
         const hasCalendar=document.querySelector('#fcalendar'); //calendar page
         const urlHasCalendar=window.location.href.includes('calendar');
-        if (hasCalendar && urlHasCalendar) {
-            log('2. Page is schoology calendar');
+        if (hasCalendar && urlHasCalendar) { //type 1: schoology calendar
+            // log('2. Page is schoology calendar');
             chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js
                 if (msg.run==='reload')
                 location.reload();
             });
             waitForEventsLoaded();
         }
-        //Course page
+        //Not calendar
         else {
             let hasCourse=window.location.href.match(/\/course\/(\d+)\//);
-            if (hasCourse) {
-                log('2. Page is schoology materials page');
+            if (hasCourse) { //type 2: course materials page
+                // log('2. Page is schoology materials page');
                 let courseId=hasCourse[1];
                 materialsPage(courseId);
+            } else if (window.location.href.includes('home')) { //type 3: schoology home page
+                // log('2. home page');
+                homePage();
+            } else { //Non-schoology-related page
+                //pass
             }
         }
     }
@@ -189,13 +193,6 @@ function materialsPage(courseId) {
                 j_check(assignmentEl, false);
             }
         }
-        // for (let course in checkedTasksGlobal) {
-        //     let assignments=checkedTasksGlobal[course];
-        //     for (let i=0; i<assignments.length; i++) {
-        //         let [infoEl, blockEl]=getAssignmentByName(assignments[i]);
-        //         j_check(blockEl, false);
-        //     }
-        // }
     }); 
     
     function getAssignmentByName(assignmentName) {
@@ -244,6 +241,8 @@ function materialsPage(courseId) {
             }
         }
     }
+}
 
-    // updateCheckedTasks();    
+function homePage() {
+    
 }
