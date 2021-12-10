@@ -7,7 +7,7 @@ function log(msg) { //logs with schoology icon
     console.log(`ⓢ`, msg);
 }
 
-function checkIfSchoologyCalendarOrCoursePage() { //checks if page is a schoology calendar page before calling next
+function determineSchoologyPageType() { //checks if page is a schoology calendar page before calling next
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
     log('1. Extension running');
     //Calendar
@@ -17,10 +17,6 @@ function checkIfSchoologyCalendarOrCoursePage() { //checks if page is a schoolog
         const urlHasCalendar=window.location.href.includes('calendar');
         if (hasCalendar && urlHasCalendar) { //type 1: schoology calendar
             // log('2. Page is schoology calendar');
-            chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js
-                if (msg.run==='reload')
-                location.reload();
-            });
             waitForEventsLoaded();
         }
         //Not calendar
@@ -48,51 +44,106 @@ function waitForEventsLoaded() { //waits for calendar's events to load before ca
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
             log('3. Add checkmarks');
-            checkmarks();
+            // SchoologyCalendarPage();
+            new CalendarPage();
         } else {
             log('Still waiting for calendar events to load');
         }
     }, 200);
 }
 
-function checkmarks() { //adds checkmarks to every calendar event
-    function addCheckmarks() {
-        jQuery(window).off('resize'); //prevent from resizing (does not work for some reason)
-        
-        const assignmentsContainer=document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode;
+class SchoologyPage { //abstract class; template for each page
+    constructor(obj) {
+        this.pageType=obj.pageType; //indicates class
+        this.getAssignmentByNamePathEl=obj.getAssignmentByNamePathEl;
+        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js
+            if (msg.run==='reload')
+                location.reload();
+        });
+        //Sets this.checkedTasksGlobal to chrome storage
+        this.checkedTasksGlobal;
+        chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
+            this.checkedTasksGlobal=checkedTasks;
+            log('checkedTasks'); log(checkedTasks);
+            for (let course in this.checkedTasksGlobal) {
+                let assignments=this.checkedTasksGlobal[course];
+                for (let i=0; i<assignments.length; i++) {
+                    let [infoEl, blockEl]=this.getAssignmentByName(assignments[i]);
+                    this.j_check(blockEl, false);
+                }
+            }
+        });
+        this.updateCheckedTasks();
+    }
+    addCheckmarks( //called in constructor, adds checkmarks to each assignment for clicking; checks those checkmarks based on chrome storage
+        assignmentsContainer, //where the assignments are located
+        customMiddleScript, //anonymous func executed in the middle
+        locateElToAppendCheckkmarkTo //determines how to add children els ie el=>el.parentNode
+    ) {
         let children=assignmentsContainer.children;
         for (let i=0; i<children.length; i++) {
-            let assignment=children[i];
+            let assignmentEl=children[i];
             let checkEl=document.createElement('input');
-            checkEl.className='j_check_cal';
+            checkEl.className=`j_check_${this.pageType}`;
             checkEl.type='checkbox';
-            // checkEl.checked
             checkEl.addEventListener('change', ()=>{
-                j_check(assignment)
+                this.j_check(assignmentEl);
             });
-            jQuery(checkEl).on('click', e=>{ //prevent assignment dialog from opening when clicking checkmark
-                e.stopPropagation();
-            });
-            assignment.appendChild(checkEl);
+            customMiddleScript(checkEl);
+            locateElToAppendCheckkmarkTo(assignmentEl).appendChild(checkEl);
         }
     }
-    addCheckmarks();
 
-    //CHECK Assignments Already Completed
-    let checkedTasksGlobal;
-    chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
-        checkedTasksGlobal=checkedTasks;
-        log('checkedTasks'); console.log(checkedTasks);
-        for (let course in checkedTasksGlobal) {
-            let assignments=checkedTasksGlobal[course];
-            for (let i=0; i<assignments.length; i++) {
-                let [infoEl, blockEl]=getAssignmentByName(assignments[i]);
-                j_check(blockEl, false);
+    getAssignmentByName(assignmentName) {
+        let queryRes=jQuery(`${this.getAssignmentByNamePathEl}:contains('${assignmentName}')`); //has info (course & event), identifier
+        //jQuery's :contains() will match elements where assignmentName is a substring of the assignment. else if below handles overlaps
+        
+        let infoEl;
+        if (queryRes.length===1) //only one matching elements 👍
+            infoEl=queryRes[0];
+        else if (queryRes.length>=2) { //2+ conflicting matches 🤏 (needs processing to find right element)
+            for (let i=0; i<queryRes.length; i++) { //test for every element
+                if (queryRes[i].firstChild.nodeValue===assignmentName) { //if element's assignment title matches assignmentName, that is the right element
+                    infoEl=queryRes[i];
+                    break;
+                }
             }
+        } else { //returns if no matches 👎
+            console.error(`No elements matched ${assignmentName}`);
+            return 'No matches';
         }
-    });
+        let blockEl=infoEl.parentNode.parentNode.parentNode; //block (has styles)
+        return [infoEl, blockEl];
+    } //returns DOMElement based on given string
 
-    function j_check(assignmentEl, storeInChrome=true) { //checks/unchecks passed in element
+    j_check() {} //polymorphism allows this function to be specialized among each SchoologyPage subclass
+
+    updateCheckedTasks(checkedTasksGlobal) { //updates chrome's storage with checked tasks parameter
+        chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
+    }
+    static checkedTasksGlobal; //holds the checkedTasks variable globally in the class
+}
+
+class CalendarPage extends SchoologyPage {
+    constructor() {
+        super({
+            pageType: 'cal',
+            getAssignmentByNamePathEl: 'span.fc-event-title>span'
+        });
+        
+        jQuery(window).off('resize'); //prevent from resizing (does not work for some reason)
+        
+        this.addCheckmarks(
+            document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
+            (checkEl)=>{
+                jQuery(checkEl).on('click', e=>{ //prevent assignment dialog from opening when clicking checkmark
+                    e.stopPropagation();
+                });
+            },
+            el=>el
+        );
+    }
+    j_check(assignmentEl, storeInChrome=true) { //checks/unchecks passed in element
         //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior assignments from storage. is true all other times
         let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
         const checkmarkEl=assignmentEl.querySelector('input.j_check_cal');
@@ -108,15 +159,15 @@ function checkmarks() { //adds checkmarks to every calendar event
             highlightGreen.classList.add('highlight-green-cal');
             
             assignmentEl.insertBefore(highlightGreen, assignmentEl.firstChild);
-           
+            
             if (storeInChrome) {
-                if (courseText in checkedTasksGlobal) { //already exists, so append
-                    checkedTasksGlobal[courseText].push(assignmentText);
+                if (courseText in this.checkedTasksGlobal) { //already exists, so append
+                    this.checkedTasksGlobal[courseText].push(assignmentText);
                 } else { //not exist, so create course log
-                    checkedTasksGlobal[courseText]=[];
-                    checkedTasksGlobal[courseText].push(assignmentText); //push to newly created class
+                    this.checkedTasksGlobal[courseText]=[];
+                    this.checkedTasksGlobal[courseText].push(assignmentText); //push to newly created class
                 }
-                updateCheckedTasks(checkedTasksGlobal);
+                this.updateCheckedTasks(this.checkedTasksGlobal);
             }
         } else {
             log(`Unchecking ${assignmentText}`);
@@ -125,124 +176,26 @@ function checkmarks() { //adds checkmarks to every calendar event
             assignmentEl.removeChild(pHighlight);
             
             // checkedTasksGlobal.pop(checkedTasksGlobal.indexOf(assignmentText));
-            checkedTasksGlobal[courseText].pop(checkedTasksGlobal[courseText].indexOf(assignmentText));
-            updateCheckedTasks(checkedTasksGlobal);
-        }
-    }
-
-    
-    function getAssignmentByName(assignmentName) { //assignment names stored in database
-        let infoEl;
-        let queryRes=jQuery(`span.fc-event-title>span:contains('${assignmentName}')`); //has info (course & event), identifier
-        //jQuery's :contains() will match elements where assignmentName is a substring of the assignment. else if below handles overlaps
-        
-        if (queryRes.length===1) //only one matching elements 👍
-        infoEl=queryRes[0];
-        else if (queryRes.length>=2) { //2+ conflicting matches 🤏 (needs processing to find right element)
-            for (let i=0; i<queryRes.length; i++) { //test for every element
-                if (queryRes[i].firstChild.nodeValue===assignmentName) { //if element's assignment title matches assignmentName, that is the right element
-                    infoEl=queryRes[i];
-                    break;
-                }
-            }
-        } else { //returns if no matches 👎
-            console.error(`No elements matched ${assignmentName}`);
-            return 'No matches';
-        }
-        let blockEl=infoEl.parentNode.parentNode.parentNode; //block (has styles)
-        return [infoEl, blockEl];
-    }
-}
-function updateCheckedTasks(checkedTasksGlobal) { //updates checked tasks in chrome's storage
-    chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
-}
-
-
-//<h1> MATERIALS PAGE
-function materialsPage(courseId) {
-    let courseName=document.querySelector("#center-top>.page-title").innerText;
-
-    function addCheckmarks() {
-        const assignmentsContainer=document.querySelector('div.upcoming-list>div.upcoming-events>div.upcoming-list');
-        let children=assignmentsContainer.children;
-        for (let i=0; i<children.length; i++) {
-            let assignmentEl=children[i];
-            if (assignmentEl.classList.contains('date-header'))
-                continue; //does not add check to date header
-
-            let checkEl=document.createElement('input');
-            checkEl.classList.add('j_check_materials');
-            checkEl.type='checkbox';
-            // checkEl.checked
-            checkEl.addEventListener('change', ()=>{
-                j_check(assignmentEl);
-            });
-            assignmentEl.firstChild.appendChild(checkEl);
-        }
-    }
-    addCheckmarks();
-
-    let checkedTasksGlobal;
-    chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
-        checkedTasksGlobal=checkedTasks;
-        log('checkedTasks'); console.log(checkedTasksGlobal);
-        if (courseName in checkedTasksGlobal) { //checked tasks in course
-            for (let i=0; i<checkedTasksGlobal[courseName].length; i++) {
-                let assignmentName=checkedTasksGlobal[courseName][i];
-                let assignmentEl=getAssignmentByName(assignmentName)
-                j_check(assignmentEl, false);
-            }
-        }
-    }); 
-    
-    function getAssignmentByName(assignmentName) {
-        let assignmentEl=jQuery(`div.upcoming-list>div.upcoming-events>div.upcoming-list>div:contains(${assignmentName})`);
-        if (assignmentEl) //return if element
-            return assignmentEl[0];
-        else //if no existing assignment by name, return null
-            return null;
-    }
-
-    function j_check(assignmentEl, storeInChrome=true) {
-        let pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
-        const checkmarkEl=assignmentEl.querySelector('input.j_check_materials');
-        let assignmentText=assignmentEl.querySelector('a').innerText;
-        
-        if (!pHighlight) { //no highlight green already, so check
-            log(`Checking ${assignmentText}`);
-            //Check
-            checkmarkEl.checked=true;
-            assignmentEl.classList.add('highlight-green');
-           
-            if (storeInChrome) {
-                if (courseName in checkedTasksGlobal) { //already exists, so append
-                    checkedTasksGlobal[courseName].push(assignmentText);
-                } else { //not exist, so create course log
-                    checkedTasksGlobal[courseName]=[];
-                    checkedTasksGlobal[courseName].push(assignmentText); //push to newly created class
-                }
-                updateCheckedTasks(checkedTasksGlobal);
-            }
-        } else { //uncheck
-            log(`Unchecking ${assignmentText}`);
-            //Uncheck
-            checkmarkEl.checked=false;
-            assignmentEl.classList.remove('highlight-green');
-            
-            try {
-                checkedTasksGlobal[courseName].pop(checkedTasksGlobal[courseName].indexOf(assignmentText));
-                updateCheckedTasks(checkedTasksGlobal);
-            } catch (err) {
-                log(err);
-                setTimeout(()=>{
-                    checkedTasksGlobal[courseName].pop(checkedTasksGlobal[courseName].indexOf(assignmentText));
-                    updateCheckedTasks(checkedTasksGlobal);
-                }, 1000);
-            }
+            this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(assignmentText));
+            this.updateCheckedTasks(this.checkedTasksGlobal);
         }
     }
 }
 
-function homePage() {
-    
+class CoursePage extends SchoologyPage { //materials page (one course)
+    constructor(courseId) {
+        super();
+        this.courseId=courseId;
+        this.courseName=document.querySelector("#center-top>.page-title").innerText;
+
+        this.addCheckmarks(
+            document.querySelector("#center-top")
+        )
+    }
+}
+
+class HomePage extends SchoologyPage {
+    constructor() {
+        super();
+    }
 }
