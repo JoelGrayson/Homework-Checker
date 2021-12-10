@@ -1,10 +1,15 @@
 //This script is injected into every page.
 //Functions are in sequential order
 
-window.addEventListener('load', checkIfSchoologyCalendarOrCoursePage, false); //wait for DOM elements to load
+let checkOffSchoologyAssignmentsConfig={
+    verbose: true //whether or not to show console.log's
+}
+
+window.addEventListener('load', determineSchoologyPageType, false); //wait for DOM elements to load
 
 function log(msg) { //logs with schoology icon
-    console.log(`ⓢ`, msg);
+    if (checkOffSchoologyAssignmentsConfig.verbose)
+        console.log(`ⓢ`, msg);
 }
 
 function determineSchoologyPageType() { //checks if page is a schoology calendar page before calling next
