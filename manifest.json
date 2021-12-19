@@ -1,5 +1,5 @@
 {
-    "name": "Check Off Schoology Assignments",
+    "name": "Homework Checker (Schoology)",
     "description": "Check off assignments in the schoology calendar view.",
     "version": "2.0",
     "manifest_version": 3,
@@ -10,8 +10,8 @@
         {
             "matches": ["<all_urls>"],
             "js": [
-                "src/jquery.min.js",
-                "content script.js"
+                "content script/jquery.min.js",
+                "content script/main.js"
             ],
             "css": ["check off.css"],
             "run_at": "document_end"
@@ -21,7 +21,7 @@
     "permissions": ["storage"],
     
     "action": {
-        "default_popup": "popup.html",
+        "default_popup": "popup/index.html",
         "default_icon": {
             "16": "./icons/logo.png",
             "32": "./icons/logo.png",

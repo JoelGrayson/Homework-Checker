@@ -1,16 +1,21 @@
 //This script is injected into every page.
 //Functions are in sequential order
 
-let checkOffSchoologyAssignmentsConfig={
+let homeworkCheckerSchoologyConfig={
     verbose: true //whether or not to show console.log's
 }
 
 window.addEventListener('load', determineSchoologyPageType, false); //wait for DOM elements to load
 
-function log(msg) { //logs with schoology icon
-    if (checkOffSchoologyAssignmentsConfig.verbose)
-        console.log(`ⓢ`, msg);
+function log(...msg) { //logs with schoology icon
+    if (homeworkCheckerSchoologyConfig.verbose)
+        console.log(`ⓢ`, ...msg);
 }
+function error(...msg) { //logs with schoology icon
+    if (homeworkCheckerSchoologyConfig.verbose)
+        console.error(`ⓢ`, ...msg);
+}
+
 
 function determineSchoologyPageType() { //checks if page is a schoology calendar page before calling next
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
@@ -114,7 +119,7 @@ class SchoologyPage { //abstract class; template for each page
                 }
             }
         } else { //returns if no matches 👎
-            console.error(`No elements matched ${assignmentName}`);
+            error(`No elements matched ${assignmentName}`);
             return 'No matches';
         }
         let blockEl=infoEl.parentNode.parentNode.parentNode; //block (has styles)
