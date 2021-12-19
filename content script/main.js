@@ -105,7 +105,8 @@ class SchoologyPage { //abstract class; template for each page
     }
 
     getAssignmentByName(assignmentName) {
-        let queryRes=jQuery(`${this.getAssignmentByNamePathEl}:contains('${assignmentName}')`); //has info (course & event), identifier
+        let query=`${this.getAssignmentByNamePathEl}:contains('${   assignmentName.replace(`'`, `\\'`) /* escape quote marks */  }')`;
+        let queryRes=jQuery(query); //has info (course & event), identifier
         //jQuery's :contains() will match elements where assignmentName is a substring of the assignment. else if below handles overlaps
         
         let infoEl;
@@ -119,7 +120,14 @@ class SchoologyPage { //abstract class; template for each page
                 }
             }
         } else { //returns if no matches 👎
-            error(`No elements matched ${assignmentName}`);
+            error(`No elements matched ${assignmentName}`, {
+                errorInfo: {
+                    getAssignmentByNamePathEl: this.getAssignmentByNamePathEl,
+                    query,
+                    queryRes,
+                    infoEl
+                }
+            });
             return 'No matches';
         }
         let blockEl=infoEl.parentNode.parentNode.parentNode; //block (has styles)
