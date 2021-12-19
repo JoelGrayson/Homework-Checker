@@ -64,6 +64,25 @@ function waitForEventsLoaded() { //waits for calendar's events to load before ca
 
 class SchoologyPage { //abstract class; template for each page
     constructor(obj) {
+        chrome.storage.sync.get('settings', ({settings})=>{
+            if (settings.showCheckmarks==='onHover') {
+                log('Only show checkmark on hover');
+                
+                //Load style if onlyShowCheckmarkOnHover
+                let styleEl=document.createElement('style');
+                styleEl.innerHTML=`
+                    .j_check_cal {
+                        visibility: hidden; /* all input checks hidden */
+                    }
+                    .fc-event:hover .j_check_cal { /* input check shown onhover of assignment */
+                        visibility: visible;
+                    }
+                `;
+                document.head.appendChild(styleEl);
+            }
+        });
+
+
         this.pageType=obj.pageType; //indicates class
         this.getAssignmentByNamePathEl=obj.getAssignmentByNamePathEl;
         chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js

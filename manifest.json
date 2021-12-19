@@ -4,16 +4,18 @@
     "version": "2.0",
     "manifest_version": 3,
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "./alter page/background.js"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
             "js": [
-                "content script/jquery.min.js",
-                "content script/main.js"
+                "./alter page/jquery.min.js",
+                "./alter page/main.js"
             ],
-            "css": ["check off.css"],
+            "css": [
+                "./alter page/check off.css"
+            ],
             "run_at": "document_end"
         }
     ],
@@ -21,7 +23,7 @@
     "permissions": ["storage"],
     
     "action": {
-        "default_popup": "popup/index.html",
+        "default_popup": "./popup/index.html",
         "default_icon": {
             "16": "./icons/logo.png",
             "32": "./icons/logo.png",

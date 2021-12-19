@@ -6,10 +6,6 @@
     right: 1px;
     bottom: 1px;    
     z-index: 11;
-    /*visibility: hidden; /* all input checks hidden */
-}
-.fc-event:hover .j_check_cal { /* input check shown onhover of assignment */
-    /* visibility: visible; */
 }
 .highlight-green {
     /* Green & cross through center */
@@ -25,12 +21,6 @@
     position: absolute;
     opacity: 0.6;
 }
-
-.highlight-green-materials {
-    /* width: 235px;
-    height: 38px; */
-}
-
 .j_check_materials {
     zoom: 1.2;
 }
