@@ -185,7 +185,7 @@ class CalendarPage extends SchoologyPage {
         let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
         const checkmarkEl=assignmentEl.querySelector('input.j_check_cal');
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
-        let courseText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title span.realm-title-course').innerText;
+        let courseText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title span[class*="realm-title"]').innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
 
         if (pHighlight==null) { //no highlight green already
             log(`Checking ${assignmentText}`);
