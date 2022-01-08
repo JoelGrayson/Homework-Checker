@@ -92,6 +92,9 @@ class SchoologyPage { //abstract class; template for each page
                     case 'reload':
                         location.reload();
                         break;
+                    case 'check all assignments':
+                        this.checkAllAssignments();
+                        break;
                     case 'check all assignments before today':
                         this.checkAllAssignmentsBeforeToday();
                         break;
@@ -200,12 +203,16 @@ class CalendarPage extends SchoologyPage {
             locateElToAppendCheckmarkTo: el=>el
         });
     }
-    checkAllAssignmentsBeforeToday() { //function for this context in class
+
+    checkAllAssignments() {
         let elementsByDate=jQuery(`span[class*='day-']`);
-        for (let i=0; i<elementsByDate.length; i++) {
-            let assignmentEl=elementsByDate[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-            if (assignmentEl!=null) {
+        for (let el of elementsByDate) {
+            let assignmentEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+            if (assignmentEl!=null)
                 this.j_check(assignmentEl, true, true); //forcedState is true
+        }
+    }
+
     checkAllAssignmentsBeforeToday() {
         let elementsByDate=jQuery(`span[class*='day-']`);
         let today=new Date().getDate();

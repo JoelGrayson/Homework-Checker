@@ -19,6 +19,10 @@ onlyShowOnHoverEl.addEventListener('change', async e=>{
 });
 
 
+//check all assignments
+document.getElementById('checkAll').addEventListener('click', ()=>{
+    sendMessage({run: 'check all assignments'});
+})
 //check all assignments before today
 document.getElementById('checkAllBeforeToday').addEventListener('click', ()=>{
     sendMessage({run: 'check all assignments before today'});
