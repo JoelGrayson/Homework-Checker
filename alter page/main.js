@@ -206,6 +206,16 @@ class CalendarPage extends SchoologyPage {
             let assignmentEl=elementsByDate[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
             if (assignmentEl!=null) {
                 this.j_check(assignmentEl, true, true); //forcedState is true
+    checkAllAssignmentsBeforeToday() {
+        let elementsByDate=jQuery(`span[class*='day-']`);
+        let today=new Date().getDate();
+        for (let el of elementsByDate) {
+            let dayOfEl=parseInt(el.className.slice(-2))
+            let beforeToday=dayOfEl<today;
+            if (beforeToday) { //before today
+                let assignmentEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                if (assignmentEl!=null)
+                    this.j_check(assignmentEl, true, true); //forcedState is true
             }
         }
     }
