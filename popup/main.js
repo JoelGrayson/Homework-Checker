@@ -1,4 +1,3 @@
-//onlyShowOnHoverEl
 const onlyShowOnHoverEl=document.getElementById('onlyShowOnHover');
 
 (async ()=>{ //Check the click if true or not
@@ -31,7 +30,7 @@ document.getElementById('resetBtn').addEventListener('click', async e=>{
     data.checkedTasks=[]; //makes list empty
     chrome.storage.sync.set(data);
 
-    sendMessage({'run': 'reload'});
+    sendMessage({run: 'reload'});
 });
 
 

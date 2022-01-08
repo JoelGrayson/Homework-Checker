@@ -7,19 +7,22 @@ let homeworkCheckerSchoologyConfig={
 
 window.addEventListener('load', determineSchoologyPageType, false); //wait for DOM elements to load
 
-function log(...msg) { //logs with schoology icon
-    if (homeworkCheckerSchoologyConfig.verbose)
-        console.log(`ⓢ`, ...msg);
-}
-function error(...msg) { //logs with schoology icon
-    if (homeworkCheckerSchoologyConfig.verbose)
-        console.error(`ⓢ`, ...msg);
-}
-
+// <Modify console.log() and console.error()
+// let ogConsoleLog=console.log;
+// console.log=(...args)=>{
+//     if (homeworkCheckerSchoologyConfig.verbose)
+//         ogConsoleLog(`ⓢ`, ...args);
+// };
+// let ogConsoleError=console.error;
+// console.error=(...args)=>{
+//     if (homeworkCheckerSchoologyConfig.verbose)
+//     ogConsoleError(`ⓢ`, ...args);
+// };
+// />
 
 function determineSchoologyPageType() { //checks if page is a schoology calendar page before calling next
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
-    log('1. Extension running');
+    console.log('1. Extension running');
     //Calendar
     const hasSchoologyScripts=document.querySelectorAll(`script[src*='schoology.com']`); //schoology page
     if (hasSchoologyScripts) { //schoology page (determine which one)
@@ -50,11 +53,11 @@ function waitForEventsLoaded() { //waits for calendar's events to load before ca
         let calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=3; //more than three assignments on calendar indicating assignments loaded
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
-            log('3. Add checkmarks');
+            console.log('3. Add checkmarks');
             // SchoologyCalendarPage();
             new CalendarPage();
         } else {
-            log('Still waiting for calendar events to load');
+            console.log('Still waiting for calendar events to load');
         }
     }, 200);
 }
@@ -63,7 +66,7 @@ class SchoologyPage { //abstract class; template for each page
     constructor(obj) {
         chrome.storage.sync.get('settings', ({settings})=>{
             if (settings.showCheckmarks==='onHover') {
-                log('Only show checkmark on hover');
+                console.log('Only show checkmark on hover');
                 
                 //Load style if onlyShowCheckmarkOnHover
                 let styleEl=document.createElement('style');
@@ -79,10 +82,11 @@ class SchoologyPage { //abstract class; template for each page
             }
         });
 
-
         this.pageType=obj.pageType; //indicates class
         this.getAssignmentByNamePathEl=obj.getAssignmentByNamePathEl;
-        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run $cmd` message from popup.js
+
+        //listens for `run $cmd` message from popup.js
+        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ 
             if (msg.hasOwnProperty('run')) {
                 switch (msg.run) {
                     case 'reload':
@@ -100,7 +104,7 @@ class SchoologyPage { //abstract class; template for each page
         this.checkedTasksGlobal;
         chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
             this.checkedTasksGlobal=checkedTasks;
-            log('checkedTasks'); log(checkedTasks);
+            console.log('checkedTasks', checkedTasks);
             for (let course in this.checkedTasksGlobal) {
                 let assignments=this.checkedTasksGlobal[course];
                 for (let i=0; i<assignments.length; i++) {
@@ -109,7 +113,6 @@ class SchoologyPage { //abstract class; template for each page
                 }
             }
         });
-        this.updateCheckedTasks();
     }
     addCheckmarks({ //called in constructor, adds checkmarks to each assignment for clicking; checks those checkmarks based on chrome storage
         assignmentsContainer, //where the assignments are located
@@ -166,7 +169,7 @@ class SchoologyPage { //abstract class; template for each page
     j_check() {} //polymorphism allows this function to be specialized among each SchoologyPage subclass
 
     updateCheckedTasks(checkedTasksGlobal) { //updates chrome's storage with checked tasks parameter
-        log('Updating to ', checkedTasksGlobal);
+        console.log('Updating to ', checkedTasksGlobal);
         chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
     }
     static checkedTasksGlobal; //holds the checkedTasks variable globally in the class
@@ -202,15 +205,16 @@ class CalendarPage extends SchoologyPage {
         }
     }
 
-    j_check(assignmentEl, storeInChrome=true) { //checks/unchecks passed in element
+    j_check(assignmentEl, storeInChrome=true, forcedState) { //checks/unchecks passed in element
         //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior assignments from storage. is true all other times
         let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
         let courseText=assignmentEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
+        let newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
 
-        if (pHighlight==null) { //no highlight green already
-            log(`Checking ${assignmentText}`);
+        if (newState) { //no highlight green already
+            console.log(`Checking ${assignmentText}`);
             //Check
             checkmarkEl.checked=true;
             let highlightGreen=document.createElement('div');
@@ -229,7 +233,7 @@ class CalendarPage extends SchoologyPage {
                 this.updateCheckedTasks(this.checkedTasksGlobal);
             }
         } else {
-            log(`Unchecking ${assignmentText}`);
+            console.log(`Unchecking ${assignmentText}`);
             //Uncheck
             checkmarkEl.checked=false;
             assignmentEl.removeChild(pHighlight);
@@ -268,10 +272,10 @@ class CoursePage extends SchoologyPage { //materials page (one course)
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
         let assignmentText=assignmentEl.querySelector('a').innerText;
         
-        log({newHighlight});
+        console.log({newHighlight});
 
         if (newHighlight) { //no highlight green already, so check
-            log(`Checking ${assignmentText}`);
+            console.log(`Checking ${assignmentText}`);
             //Check
             checkmarkEl.checked=true;
             assignmentEl.classList.add('highlight-green');
@@ -286,7 +290,7 @@ class CoursePage extends SchoologyPage { //materials page (one course)
                 this.updateCheckedTasks(this.checkedTasksGlobal);
             }
         } else { //uncheck
-            log(`Unchecking ${assignmentText}`);
+            console.log(`Unchecking ${assignmentText}`);
             //Uncheck
             checkmarkEl.checked=false;
             assignmentEl.classList.remove('highlight-green');
@@ -295,7 +299,7 @@ class CoursePage extends SchoologyPage { //materials page (one course)
                 this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
                 this.updateCheckedTasks(this.checkedTasksGlobal);
             } catch (err) {
-                log(err);
+                console.error(err);
                 setTimeout(()=>{ //do same thing a second later
                     this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
                     this.updateCheckedTasks(this.checkedTasksGlobal);
