@@ -2,7 +2,7 @@
 //Functions are in sequential order
 
 let homeworkCheckerSchoologyConfig={
-    verbose: true //whether or not to show console.log's
+    verbose: true //whether or not to show console messages
 }
 
 window.addEventListener('load', determineSchoologyPageType, false); //wait for DOM elements to load
@@ -21,24 +21,21 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
     log('1. Extension running');
     //Calendar
-    const hasSchoologyScripts=document.querySelectorAll('script[src*="schoology.com"]'); //schoology page
+    const hasSchoologyScripts=document.querySelectorAll(`script[src*='schoology.com']`); //schoology page
     if (hasSchoologyScripts) { //schoology page (determine which one)
         const hasCalendar=document.querySelector('#fcalendar'); //calendar page
         const urlHasCalendar=window.location.href.includes('calendar');
         if (hasCalendar && urlHasCalendar) { //type 1: schoology calendar
-            // log('2. Page is schoology calendar');
             waitForEventsLoaded();
         }
         //Not calendar
         else {
             let hasCourse=window.location.href.match(/\/course\/(\d+)\//);
             if (hasCourse) { //type 2: course materials page
-                // log('2. Page is schoology materials page');
                 let courseId=hasCourse[1];
-                materialsPage(courseId);
+                new CoursePage(courseId);
             } else if (window.location.href.includes('home')) { //type 3: schoology home page
-                // log('2. home page');
-                homePage();
+                new HomePage();
             } else { //Non-schoology-related page
                 //pass
             }
@@ -85,9 +82,19 @@ class SchoologyPage { //abstract class; template for each page
 
         this.pageType=obj.pageType; //indicates class
         this.getAssignmentByNamePathEl=obj.getAssignmentByNamePathEl;
-        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run reload` message from popup.js
-            if (msg.run==='reload')
-                location.reload();
+        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //listens for `run $cmd` message from popup.js
+            if (msg.hasOwnProperty('run')) {
+                switch (msg.run) {
+                    case 'reload':
+                        location.reload();
+                        break;
+                    case 'check all assignments before today':
+                        this.checkAllAssignmentsBeforeToday();
+                        break;
+                    default:
+                        error('Unknown run message:', msg.run)
+                }
+            }
         });
         //Sets this.checkedTasksGlobal to chrome storage
         this.checkedTasksGlobal;
@@ -104,11 +111,11 @@ class SchoologyPage { //abstract class; template for each page
         });
         this.updateCheckedTasks();
     }
-    addCheckmarks( //called in constructor, adds checkmarks to each assignment for clicking; checks those checkmarks based on chrome storage
+    addCheckmarks({ //called in constructor, adds checkmarks to each assignment for clicking; checks those checkmarks based on chrome storage
         assignmentsContainer, //where the assignments are located
         customMiddleScript, //anonymous func executed in the middle
-        locateElToAppendCheckkmarkTo //determines how to add children els ie el=>el.parentNode
-    ) {
+        locateElToAppendCheckmarkTo //determines how to add children els ie el=>el.parentNode
+    }) {
         let children=assignmentsContainer.children;
         for (let i=0; i<children.length; i++) {
             let assignmentEl=children[i];
@@ -118,8 +125,11 @@ class SchoologyPage { //abstract class; template for each page
             checkEl.addEventListener('change', ()=>{
                 this.j_check(assignmentEl);
             });
-            customMiddleScript(checkEl);
-            locateElToAppendCheckkmarkTo(assignmentEl).appendChild(checkEl);
+            let toRun=customMiddleScript(checkEl, assignmentEl); //returns string to evaluate (rarely used)
+            if (toRun==='continue')
+                continue;
+            
+            locateElToAppendCheckmarkTo(assignmentEl).appendChild(checkEl);
         }
     }
 
@@ -156,6 +166,7 @@ class SchoologyPage { //abstract class; template for each page
     j_check() {} //polymorphism allows this function to be specialized among each SchoologyPage subclass
 
     updateCheckedTasks(checkedTasksGlobal) { //updates chrome's storage with checked tasks parameter
+        log('Updating to ', checkedTasksGlobal);
         chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
     }
     static checkedTasksGlobal; //holds the checkedTasks variable globally in the class
@@ -169,23 +180,34 @@ class CalendarPage extends SchoologyPage {
         });
         
         jQuery(window).off('resize'); //prevent from resizing (does not work for some reason)
+        window.removeEventListener
         
-        this.addCheckmarks(
-            document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
-            (checkEl)=>{
+        this.addCheckmarks({
+            assignmentsContainer: document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
+            customMiddleScript: (checkEl, assignmentEl)=>{
                 jQuery(checkEl).on('click', e=>{ //prevent assignment dialog from opening when clicking checkmark
                     e.stopPropagation();
                 });
             },
-            el=>el
-        );
+            locateElToAppendCheckmarkTo: el=>el
+        });
     }
+    checkAllAssignmentsBeforeToday() { //function for this context in class
+        let elementsByDate=jQuery(`span[class*='day-']`);
+        for (let i=0; i<elementsByDate.length; i++) {
+            let assignmentEl=elementsByDate[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+            if (assignmentEl!=null) {
+                this.j_check(assignmentEl, true, true); //forcedState is true
+            }
+        }
+    }
+
     j_check(assignmentEl, storeInChrome=true) { //checks/unchecks passed in element
         //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior assignments from storage. is true all other times
         let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
-        const checkmarkEl=assignmentEl.querySelector('input.j_check_cal');
+        const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
-        let courseText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title span[class*="realm-title"]').innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
+        let courseText=assignmentEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
 
         if (pHighlight==null) { //no highlight green already
             log(`Checking ${assignmentText}`);
@@ -193,7 +215,7 @@ class CalendarPage extends SchoologyPage {
             checkmarkEl.checked=true;
             let highlightGreen=document.createElement('div');
             highlightGreen.classList.add('highlight-green');
-            highlightGreen.classList.add('highlight-green-cal');
+            highlightGreen.classList.add(`highlight-green-${this.pageType}`);
             
             assignmentEl.insertBefore(highlightGreen, assignmentEl.firstChild);
             
@@ -221,18 +243,79 @@ class CalendarPage extends SchoologyPage {
 
 class CoursePage extends SchoologyPage { //materials page (one course)
     constructor(courseId) {
-        super();
+        super({
+            pageType: 'course',
+            getAssignmentByNamePathEl: '.upcoming-list .upcoming-events .upcoming-list'
+        });
         this.courseId=courseId;
-        this.courseName=document.querySelector("#center-top>.page-title").innerText;
+        this.courseName=document.querySelector('#center-top>.page-title').innerText;
 
-        this.addCheckmarks(
-            document.querySelector("#center-top")
-        )
+        this.addCheckmarks({
+            assignmentsContainer: document.querySelector(this.getAssignmentByNamePathEl),
+            customMiddleScript: (checkEl, assignmentEl)=>{
+                if (assignmentEl.classList.contains('date-header'))
+                    return 'continue'; //does not add check to date header by running continue to break out of loop
+            },
+            locateElToAppendCheckmarkTo: el=>el.firstChild
+        });
+    }
+    j_check(assignmentEl, storeInChrome=true, forcedState) { //forceState forces the check to be true/false
+        let pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
+        let newHighlight=!pHighlight; //opposite when checking
+        if (forcedState!=undefined) //if user forced state, override newHighlight
+            newHiglight=forcedState;
+
+        const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
+        let assignmentText=assignmentEl.querySelector('a').innerText;
+        
+        log({newHighlight});
+
+        if (newHighlight) { //no highlight green already, so check
+            log(`Checking ${assignmentText}`);
+            //Check
+            checkmarkEl.checked=true;
+            assignmentEl.classList.add('highlight-green');
+           
+            if (storeInChrome) {
+                if (this.courseName in this.checkedTasksGlobal) { //already exists, so append
+                    this.checkedTasksGlobal[this.courseName].push(assignmentText);
+                } else { //not exist, so create course log
+                    this.checkedTasksGlobal[this.courseName]=[];
+                    this.checkedTasksGlobal[this.courseName].push(assignmentText); //push to newly created class
+                }
+                this.updateCheckedTasks(this.checkedTasksGlobal);
+            }
+        } else { //uncheck
+            log(`Unchecking ${assignmentText}`);
+            //Uncheck
+            checkmarkEl.checked=false;
+            assignmentEl.classList.remove('highlight-green');
+            
+            try {
+                this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
+                this.updateCheckedTasks(this.checkedTasksGlobal);
+            } catch (err) {
+                log(err);
+                setTimeout(()=>{ //do same thing a second later
+                    this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
+                    this.updateCheckedTasks(this.checkedTasksGlobal);
+                }, 1000);
+            }
+        }
     }
 }
 
 class HomePage extends SchoologyPage {
     constructor() {
-        super();
+        super({
+            pageType: 'home',
+            getAssignmentByNamePathEl: 'span.fc-event-title>span'
+        });
+
+        this.addCheckmarks({
+            assignmentsContainer: document.querySelector('div.upcoming-list'),
+            customMiddleScript: (checkEl, assignmentEl)=>{},
+            locateElToAppendCheckmarkTo: el=>el,
+        });
     }
 }

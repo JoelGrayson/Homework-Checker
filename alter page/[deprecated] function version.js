@@ -25,7 +25,7 @@ function SchoologyCalendarPage() { //adds checkmarks to every calendar event
     let checkedTasksGlobal;
     chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
         checkedTasksGlobal=checkedTasks;
-        log('checkedTasks'); console.log(checkedTasks);
+        log('checkedTasks', checkedTasks);
         for (let course in checkedTasksGlobal) {
             let assignments=checkedTasksGlobal[course];
             for (let i=0; i<assignments.length; i++) {
@@ -124,7 +124,7 @@ function materialsPage(courseId) {
     let checkedTasksGlobal;
     chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
         checkedTasksGlobal=checkedTasks;
-        log('checkedTasks'); console.log(checkedTasksGlobal);
+        log('checkedTasks', checkedTasksGlobal);
         if (courseName in checkedTasksGlobal) { //checked tasks in course
             for (let i=0; i<checkedTasksGlobal[courseName].length; i++) {
                 let assignmentName=checkedTasksGlobal[courseName][i];

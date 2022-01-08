@@ -1,18 +1,20 @@
 /* #fcalendar>div.fc-content>div.fc-view>div>div.fc-event - assignment */
 
-.j_check_cal {
-    zoom: 1.2;
-    position: absolute;
-    right: 1px;
-    bottom: 1px;    
-    z-index: 11;
-}
+/* All */
 .highlight-green {
     /* Green & cross through center */
     background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 15 -5 L -5 15 L 15 15 L 15 -5 L -5 -5 L -5 15 Z' fill='rgb(115, 252, 127)' stroke='green' /></svg>");
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 100% 100%, auto;
+}
+/* Calendar */
+.j_check_cal {
+    zoom: 1.2;
+    position: absolute;
+    right: 1px;
+    bottom: 1px;    
+    z-index: 11;
 }
 .highlight-green-cal {
     width: 100%;
@@ -21,6 +23,12 @@
     position: absolute;
     opacity: 0.6;
 }
-.j_check_materials {
+
+/* Course */
+.j_check_course {
+    zoom: 1.2;
+}
+/* Home */
+.j_check_home {
     zoom: 1.2;
 }
