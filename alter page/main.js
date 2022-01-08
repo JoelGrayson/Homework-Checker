@@ -44,8 +44,8 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
             }
         }
     }
-
 }
+
 //<h1> CALENDAR
 //Resize event listener
 function waitForEventsLoaded() { //waits for calendar's events to load before calling next
@@ -182,9 +182,14 @@ class CalendarPage extends SchoologyPage {
             getAssignmentByNamePathEl: 'span.fc-event-title>span'
         });
         
-        jQuery(window).off('resize'); //prevent from resizing (does not work for some reason)
-        window.removeEventListener
-        
+        //Disable window resizing because calendar re-renders when resizing, removing checkmarks
+        function injectScript(path) {
+            const script=document.createElement('script');
+            script.src=path;
+            document.body.appendChild(script);
+        }
+        injectScript(chrome.runtime.getURL('alter page/injected/remove window resize listener.js'));
+
         this.addCheckmarks({
             assignmentsContainer: document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
             customMiddleScript: (checkEl, assignmentEl)=>{

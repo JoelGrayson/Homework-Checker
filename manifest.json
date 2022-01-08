@@ -4,17 +4,17 @@
     "version": "2.0",
     "manifest_version": 3,
     "background": {
-        "service_worker": "./alter page/background.js"
+        "service_worker": "alter page/background.js"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
             "js": [
-                "./alter page/jquery.min.js",
-                "./alter page/main.js"
+                "alter page/jquery.min.js",
+                "alter page/main.js"
             ],
             "css": [
-                "./alter page/check off.css"
+                "alter page/check off.css"
             ],
             "run_at": "document_end"
         }
@@ -22,19 +22,26 @@
     "host_permissions": ["<all_urls>"],
     "permissions": ["storage"],
     
+    "web_accessible_resources": [
+        {
+            "resources": ["alter%20page/injected/remove%20window%20resize%20listener.js"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    
     "action": {
-        "default_popup": "./popup/index.html",
+        "default_popup": "popup/index.html",
         "default_icon": {
-            "16": "./icons/logo.png",
-            "32": "./icons/logo.png",
-            "48": "./icons/logo.png",
-            "128": "./icons/logo.png"
+            "16": "icons/logo.png",
+            "32": "icons/logo.png",
+            "48": "icons/logo.png",
+            "128": "icons/logo.png"
         }
     },
     "icons": {
-        "16": "./icons/logo.png",
-        "32": "./icons/logo.png",
-        "48": "./icons/logo.png",
-        "128": "./icons/logo.png"
+        "16": "icons/logo.png",
+        "32": "icons/logo.png",
+        "48": "icons/logo.png",
+        "128": "icons/logo.png"
     }
 }
