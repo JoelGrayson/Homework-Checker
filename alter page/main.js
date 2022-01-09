@@ -39,7 +39,7 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
                 new CoursePage(courseId);
             } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
                 let assignmentsAreLoading=true;
-                let intervalId=setInterval(()=>{ //wait until loading icon to insert new HomePage();
+                let intervalId=setInterval(()=>{ //wait until loading gone icon to insert new HomePage();
                     let assignmentsAreLoading=document.querySelector('.upcoming-list>.refresh-wrapper')!=null; //not done loading assignments
                     if (!assignmentsAreLoading) { //done loading
                         new HomePage();
@@ -170,7 +170,7 @@ class SchoologyPage { //abstract class; template for each page
         }
     }
 
-    getAssignmentByName(assignmentName) {
+    getAssignmentByName(assignmentName) { //returns DOMElement based on given string
         let query=`${this.getAssignmentByNamePathEl}:contains('${   assignmentName.replace(`'`, `\\'`) /* escape quote marks */  }')`;
         let queryRes=jQuery(query); //has info (course & event), identifier
         //jQuery's :contains() will match elements where assignmentName is a substring of the assignment. else if below handles overlaps
@@ -198,7 +198,7 @@ class SchoologyPage { //abstract class; template for each page
         }
         let blockEl=this.infoToBlockEl(infoEl); //block (has styles)
         return [infoEl, blockEl];
-    } //returns DOMElement based on given string
+    }
 
     j_check() {} //polymorphism allows this function to be specialized among each SchoologyPage subclass
 
@@ -378,8 +378,8 @@ class HomePage extends SchoologyPage {
     constructor() {
         super({
             pageType: 'home',
-            getAssignmentByNamePathEl: 'div.upcoming-list',
-            infoToBlockEl: el=>el.parentNode,
+            getAssignmentByNamePathEl: 'div.upcoming-list>div',
+            infoToBlockEl: el=>el,
             checkPrev: {
                 courses: '$all',
                 time: 'any'
