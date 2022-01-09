@@ -63,7 +63,7 @@ function waitForEventsLoaded() { //waits for calendar's events to load before ca
 }
 
 class SchoologyPage { //abstract class; template for each page
-    constructor({pageType, getAssignmentByNamePathEl, infoToBlockEl}) {
+    constructor({pageType, getAssignmentByNamePathEl, infoToBlockEl, checkPrev}) {
         chrome.storage.sync.get('settings', ({settings})=>{
             if (settings.showCheckmarks==='onHover') {
                 console.log('Only show checkmark on hover');
@@ -85,6 +85,11 @@ class SchoologyPage { //abstract class; template for each page
         this.pageType=pageType; //indicates css class for checkbox
         this.getAssignmentByNamePathEl=getAssignmentByNamePathEl; //from where to search :contains() of an assignment by name
         this.infoToBlockEl=infoToBlockEl;
+        this.checkPrev=checkPrev;
+        /*{
+            courses, //'$all' | String of course name
+            time //'any' | 'future'
+        }*/
 
         //listens for `run $cmd` message from popup.js
         chrome.runtime.onMessage.addListener((msg, sender, response)=>{ 
@@ -109,11 +114,34 @@ class SchoologyPage { //abstract class; template for each page
         chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
             this.checkedTasksGlobal=checkedTasks;
             console.log('checkedTasks', checkedTasks);
-            for (let course in this.checkedTasksGlobal) { //checks previous assignments
-                let assignments=this.checkedTasksGlobal[course];
-                for (let assignmentEl of assignments) {
-                    let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
-                    this.j_check(blockEl, false);
+            //checks previous assignments
+            console.log(this.checkPrev)
+            let courses=this.checkPrev.courses;
+            let time=this.checkPrev.time;
+            if (courses==='$all' && time==='any') { //calendar
+                for (let course in this.checkedTasksGlobal) {
+                    let assignments=this.checkedTasksGlobal[course];
+                    for (let assignmentEl of assignments) {
+                        let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
+                        this.j_check(blockEl, false);
+                    }
+                }
+            } else if (courses==='$all' && time==='any') { //home page (all)
+                for (let course in this.checkedTasksGlobal) {
+                    let assignments=this.checkedTasksGlobal[course];
+                    for (let assignmentEl of assignments) {
+                        let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
+                        this.j_check(blockEl, false);
+                    }
+                }
+                
+            } else if (courses!=='$all' && time==='any') { //course page (all assignments of course)
+                if (this.checkPrev.courses in this.checkedTasksGlobal) { //if checked assignments of that course
+                    let assignments=this.checkedTasksGlobal[courses];
+                    for (let assignmentEl of assignments) {
+                        let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
+                        this.j_check(blockEl, false);
+                    }
                 }
             }
         });
@@ -162,7 +190,7 @@ class SchoologyPage { //abstract class; template for each page
                     queryRes,
                     infoEl
                 }
-            });
+            }, 'This error may be caused by old assignments');
             return 'No matches';
         }
         let blockEl=this.infoToBlockEl(infoEl); //block (has styles)
@@ -183,7 +211,11 @@ class CalendarPage extends SchoologyPage {
         super({
             pageType: 'cal',
             getAssignmentByNamePathEl: 'span.fc-event-title>span',
-            infoToBlockEl: el=>el.parentNode.parentNode.parentNode
+            infoToBlockEl: el=>el.parentNode.parentNode.parentNode,
+            checkPrev: {
+                courses: '$all',
+                time: 'any'
+            }
         });
         
         //Disable window resizing because calendar re-renders when resizing, removing checkmarks
@@ -271,13 +303,18 @@ class CalendarPage extends SchoologyPage {
 class CoursePage extends SchoologyPage { //materials page (one course)
     constructor(courseId) {
         let containerPath=`#course-events .upcoming-list .upcoming-events .upcoming-list`;
+        let courseName=document.querySelector('#center-top>.page-title').innerText; //grabs course title
         super({
             pageType: 'course',
             getAssignmentByNamePathEl: `${containerPath}>div[data-start]`, //searches inside assignment
-            infoToBlockEl: el=>el
+            infoToBlockEl: el=>el,
+            checkPrev: {
+                courses: courseName,
+                time: 'any'
+            }
         });
         this.courseId=courseId;
-        this.courseName=document.querySelector('#center-top>.page-title').innerText; //grabs course title
+        this.courseName=courseName;
 
         this.addCheckmarks({
             assignmentsContainer: document.querySelector(containerPath), //all assignments' container
