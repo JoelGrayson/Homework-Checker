@@ -63,7 +63,7 @@ function waitForEventsLoaded() { //waits for calendar's events to load before ca
 }
 
 class SchoologyPage { //abstract class; template for each page
-    constructor(obj) {
+    constructor({pageType, getAssignmentByNamePathEl, infoToBlockEl}) {
         chrome.storage.sync.get('settings', ({settings})=>{
             if (settings.showCheckmarks==='onHover') {
                 console.log('Only show checkmark on hover');
@@ -82,8 +82,9 @@ class SchoologyPage { //abstract class; template for each page
             }
         });
 
-        this.pageType=obj.pageType; //indicates class
-        this.getAssignmentByNamePathEl=obj.getAssignmentByNamePathEl;
+        this.pageType=pageType; //indicates css class for checkbox
+        this.getAssignmentByNamePathEl=getAssignmentByNamePathEl; //from where to search :contains() of an assignment by name
+        this.infoToBlockEl=infoToBlockEl;
 
         //listens for `run $cmd` message from popup.js
         chrome.runtime.onMessage.addListener((msg, sender, response)=>{ 
@@ -99,7 +100,7 @@ class SchoologyPage { //abstract class; template for each page
                         this.checkAllAssignmentsBeforeToday();
                         break;
                     default:
-                        error('Unknown run message:', msg.run)
+                        console.error('Unknown run message:', msg.run)
                 }
             }
         });
@@ -108,23 +109,22 @@ class SchoologyPage { //abstract class; template for each page
         chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
             this.checkedTasksGlobal=checkedTasks;
             console.log('checkedTasks', checkedTasks);
-            for (let course in this.checkedTasksGlobal) {
+            for (let course in this.checkedTasksGlobal) { //checks previous assignments
                 let assignments=this.checkedTasksGlobal[course];
-                for (let i=0; i<assignments.length; i++) {
-                    let [infoEl, blockEl]=this.getAssignmentByName(assignments[i]);
+                for (let assignmentEl of assignments) {
+                    let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
                     this.j_check(blockEl, false);
                 }
             }
         });
     }
-    addCheckmarks({ //called in constructor, adds checkmarks to each assignment for clicking; checks those checkmarks based on chrome storage
+    addCheckmarks({ //called in subclass' constructor, adds checkmarks to each assignment for clicking; checks those checkmarks based on chrome storage
         assignmentsContainer, //where the assignments are located
         customMiddleScript, //anonymous func executed in the middle
         locateElToAppendCheckmarkTo //determines how to add children els ie el=>el.parentNode
     }) {
         let children=assignmentsContainer.children;
-        for (let i=0; i<children.length; i++) {
-            let assignmentEl=children[i];
+        for (let assignmentEl of children) {
             let checkEl=document.createElement('input');
             checkEl.className=`j_check_${this.pageType}`;
             checkEl.type='checkbox';
@@ -147,7 +147,7 @@ class SchoologyPage { //abstract class; template for each page
         let infoEl;
         if (queryRes.length===1) //only one matching elements 👍
             infoEl=queryRes[0];
-        else if (queryRes.length>=2) { //2+ conflicting matches 🤏 (needs processing to find right element)
+        else if (queryRes.length>=2) { //2+ conflicting matches 🤏 so so  (needs processing to find right element)
             for (let i=0; i<queryRes.length; i++) { //test for every element
                 if (queryRes[i].firstChild.nodeValue===assignmentName) { //if element's assignment title matches assignmentName, that is the right element
                     infoEl=queryRes[i];
@@ -155,7 +155,7 @@ class SchoologyPage { //abstract class; template for each page
                 }
             }
         } else { //returns if no matches 👎
-            error(`No elements matched ${assignmentName}`, {
+            console.error(`No elements matched ${assignmentName}`, {
                 errorInfo: {
                     getAssignmentByNamePathEl: this.getAssignmentByNamePathEl,
                     query,
@@ -165,7 +165,7 @@ class SchoologyPage { //abstract class; template for each page
             });
             return 'No matches';
         }
-        let blockEl=infoEl.parentNode.parentNode.parentNode; //block (has styles)
+        let blockEl=this.infoToBlockEl(infoEl); //block (has styles)
         return [infoEl, blockEl];
     } //returns DOMElement based on given string
 
@@ -182,7 +182,8 @@ class CalendarPage extends SchoologyPage {
     constructor() {
         super({
             pageType: 'cal',
-            getAssignmentByNamePathEl: 'span.fc-event-title>span'
+            getAssignmentByNamePathEl: 'span.fc-event-title>span',
+            infoToBlockEl: el=>el.parentNode.parentNode.parentNode
         });
         
         //Disable window resizing because calendar re-renders when resizing, removing checkmarks
@@ -269,34 +270,34 @@ class CalendarPage extends SchoologyPage {
 
 class CoursePage extends SchoologyPage { //materials page (one course)
     constructor(courseId) {
+        let containerPath=`#course-events .upcoming-list .upcoming-events .upcoming-list`;
         super({
             pageType: 'course',
-            getAssignmentByNamePathEl: '.upcoming-list .upcoming-events .upcoming-list'
+            getAssignmentByNamePathEl: `${containerPath}>div[data-start]`, //searches inside assignment
+            infoToBlockEl: el=>el
         });
         this.courseId=courseId;
-        this.courseName=document.querySelector('#center-top>.page-title').innerText;
+        this.courseName=document.querySelector('#center-top>.page-title').innerText; //grabs course title
 
         this.addCheckmarks({
-            assignmentsContainer: document.querySelector(this.getAssignmentByNamePathEl),
+            assignmentsContainer: document.querySelector(containerPath), //all assignments' container
             customMiddleScript: (checkEl, assignmentEl)=>{
-                if (assignmentEl.classList.contains('date-header'))
-                    return 'continue'; //does not add check to date header by running continue to break out of loop
+                if (assignmentEl.classList.contains('date-header')) //does not add check to .date-header by continue;ing out of loop
+                    return 'continue';
             },
             locateElToAppendCheckmarkTo: el=>el.firstChild
         });
     }
     j_check(assignmentEl, storeInChrome=true, forcedState) { //forceState forces the check to be true/false
         let pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
-        let newHighlight=!pHighlight; //opposite when checking
-        if (forcedState!=undefined) //if user forced state, override newHighlight
-            newHiglight=forcedState;
+        let newState=forcedState ?? !pHighlight; //opposite when checking
 
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
         let assignmentText=assignmentEl.querySelector('a').innerText;
         
-        console.log({newHighlight});
+        console.log({newHighlight: newState, pHighlight, checkmarkEl});
 
-        if (newHighlight) { //no highlight green already, so check
+        if (newState) { //no highlight green already, so check
             console.log(`Checking ${assignmentText}`);
             //Check
             checkmarkEl.checked=true;
@@ -318,8 +319,10 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             assignmentEl.classList.remove('highlight-green');
             
             try {
-                this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
-                this.updateCheckedTasks(this.checkedTasksGlobal);
+                this.checkedTasksGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
+                    this.checkedTasksGlobal[this.courseName].indexOf(assignmentText)
+                );
+                this.updateCheckedTasks(this.checkedTasksGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
