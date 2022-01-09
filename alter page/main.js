@@ -38,7 +38,15 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
                 let courseId=hasCourse[1];
                 new CoursePage(courseId);
             } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
-                new HomePage();
+                let assignmentsAreLoading=true;
+                let intervalId=setInterval(()=>{ //wait until loading icon to insert new HomePage();
+                    let assignmentsAreLoading=document.querySelector('.upcoming-list>.refresh-wrapper')!=null; //not done loading assignments
+                    if (!assignmentsAreLoading) { //done loading
+                        new HomePage();
+                        clearInterval(intervalId);
+                    }
+                    // Otherwise, keep checking every tenth of second
+                }, 100)
             } else { //Non-schoology-related page
                 //pass
             }
@@ -370,7 +378,7 @@ class HomePage extends SchoologyPage {
     constructor() {
         super({
             pageType: 'home',
-            getAssignmentByNamePathEl: 'span.fc-event-title>span',
+            getAssignmentByNamePathEl: 'div.upcoming-list',
             infoToBlockEl: el=>el.parentNode,
             checkPrev: {
                 courses: '$all',
@@ -378,7 +386,7 @@ class HomePage extends SchoologyPage {
             }
         });
         let selector=`h4>span`;
-        let id='j_check_container';
+        let containerClass='j_check_container';
         this.addCheckmarks({
             assignmentsContainer: document.querySelector('div.upcoming-list'),
             customMiddleScript: (checkEl, assignmentEl)=>{
@@ -386,15 +394,54 @@ class HomePage extends SchoologyPage {
                     return 'continue';
                 else { //valid assignmment
                     let jCheckContainer=document.createElement('span');
-                    jCheckContainer.id=id;
+                    jCheckContainer.classList.add(containerClass);
                     let parentNode=assignmentEl.querySelector(selector);
                     parentNode.insertBefore(jCheckContainer, parentNode.querySelector('span.upcoming-time'));
                 }
             },
-            locateElToAppendCheckmarkTo: el=>el.querySelector(`${selector} span#${id}`),
+            locateElToAppendCheckmarkTo: el=>el.querySelector(`${selector} span.${containerClass}`),
         });
     }
     j_check(assignmentEl, storeInChrome=true, forcedState) {
+        let pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
+        let newState=forcedState ?? !pHighlight; //opposite when checking
 
+        const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
+        let assignmentText=assignmentEl.querySelector('a').innerText;
+        let courseText=assignmentEl.querySelector('h4>span').ariaLabel; //name of course based on aria-label of assignmentEl's <h4>'s <span>'s <div>
+
+        if (newState) { //check
+            console.log(`Checking ${assignmentText}`);
+
+            checkmarkEl.checked=true;
+            assignmentEl.classList.add('highlight-green');
+           
+            if (storeInChrome) {
+                if (courseText in this.checkedTasksGlobal) { //already exists, so append
+                    this.checkedTasksGlobal[courseText].push(assignmentText);
+                } else { //not exist, so create course log
+                    this.checkedTasksGlobal[courseText]=[];
+                    this.checkedTasksGlobal[courseText].push(assignmentText); //push to newly created class
+                }
+                this.updateCheckedTasks(this.checkedTasksGlobal);
+            }
+        } else {//uncheck
+            console.log(`Unchecking ${assignmentText}`);
+            checkmarkEl.checked=false;
+            assignmentEl.classList.remove('highlight-green');
+            
+            try {
+                this.checkedTasksGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
+                    this.checkedTasksGlobal[this.courseName].indexOf(assignmentText)
+                );
+                this.updateCheckedTasks(this.checkedTasksGlobal); //update
+            } catch (err) {
+                console.error(err);
+                setTimeout(()=>{ //do same thing a second later
+                    this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
+                    this.updateCheckedTasks(this.checkedTasksGlobal);
+                }, 1000);
+            }
+        }
     }
 }
