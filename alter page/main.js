@@ -27,17 +27,17 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
     const hasSchoologyScripts=document.querySelectorAll(`script[src*='schoology.com']`); //schoology page
     if (hasSchoologyScripts) { //schoology page (determine which one)
         const hasCalendar=document.querySelector('#fcalendar'); //calendar page
-        const urlHasCalendar=window.location.href.includes('calendar');
+        const urlHasCalendar=window.location.pathname.includes('calendar');
         if (hasCalendar && urlHasCalendar) { //type 1: schoology calendar
             waitForEventsLoaded();
         }
         //Not calendar
         else {
-            let hasCourse=window.location.href.match(/\/course\/(\d+)\//);
+            let hasCourse=window.location.pathname.match(/\/course\/(\d+)\//);
             if (hasCourse) { //type 2: course materials page
                 let courseId=hasCourse[1];
                 new CoursePage(courseId);
-            } else if (window.location.href.includes('home')) { //type 3: schoology home page
+            } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
                 new HomePage();
             } else { //Non-schoology-related page
                 //pass
@@ -118,7 +118,7 @@ class SchoologyPage { //abstract class; template for each page
             console.log(this.checkPrev)
             let courses=this.checkPrev.courses;
             let time=this.checkPrev.time;
-            if (courses==='$all' && time==='any') { //calendar
+            if (courses==='$all' && time==='any') { //calendar or home page
                 for (let course in this.checkedTasksGlobal) {
                     let assignments=this.checkedTasksGlobal[course];
                     for (let assignmentEl of assignments) {
@@ -126,18 +126,13 @@ class SchoologyPage { //abstract class; template for each page
                         this.j_check(blockEl, false);
                     }
                 }
-            } else if (courses==='$all' && time==='any') { //home page (all)
-                for (let course in this.checkedTasksGlobal) {
-                    let assignments=this.checkedTasksGlobal[course];
-                    for (let assignmentEl of assignments) {
-                        let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
-                        this.j_check(blockEl, false);
-                    }
-                }
-                
+            } else if (courses==='$all' && time==='future') { //not being used, potential if not prev assignments
+
             } else if (courses!=='$all' && time==='any') { //course page (all assignments of course)
+                console.log(`Only checking the course: ${courses}`)
                 if (this.checkPrev.courses in this.checkedTasksGlobal) { //if checked assignments of that course
                     let assignments=this.checkedTasksGlobal[courses];
+                    console.log('Assignments', assignments);
                     for (let assignmentEl of assignments) {
                         let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
                         this.j_check(blockEl, false);
@@ -375,13 +370,31 @@ class HomePage extends SchoologyPage {
     constructor() {
         super({
             pageType: 'home',
-            getAssignmentByNamePathEl: 'span.fc-event-title>span'
+            getAssignmentByNamePathEl: 'span.fc-event-title>span',
+            infoToBlockEl: el=>el.parentNode,
+            checkPrev: {
+                courses: '$all',
+                time: 'any'
+            }
         });
-
+        let selector=`h4>span`;
+        let id='j_check_container';
         this.addCheckmarks({
             assignmentsContainer: document.querySelector('div.upcoming-list'),
-            customMiddleScript: (checkEl, assignmentEl)=>{},
-            locateElToAppendCheckmarkTo: el=>el,
+            customMiddleScript: (checkEl, assignmentEl)=>{
+                if (assignmentEl.classList.contains('date-header'))
+                    return 'continue';
+                else { //valid assignmment
+                    let jCheckContainer=document.createElement('span');
+                    jCheckContainer.id=id;
+                    let parentNode=assignmentEl.querySelector(selector);
+                    parentNode.insertBefore(jCheckContainer, parentNode.querySelector('span.upcoming-time'));
+                }
+            },
+            locateElToAppendCheckmarkTo: el=>el.querySelector(`${selector} span#${id}`),
         });
+    }
+    j_check(assignmentEl, storeInChrome=true, forcedState) {
+
     }
 }
