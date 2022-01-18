@@ -17,3 +17,7 @@ h1 {
 label {
     word-wrap: break-word;
 }
+
+.beta {
+    display: none /* do not show beta features by default */
+}

@@ -8,26 +8,34 @@
 </head>
 <body>
     <h1>Homework Checker</h1>
+    <h3>Settings</h3>
     <div class='custom-control custom-switch'>
         <input type='checkbox' class='custom-control-input' id='onlyShowOnHover'>
         <label class='custom-control-label' for='onlyShowOnHover'>Only show checkmarks when hovering assignment</label>
     </div>
+    <div class='custom-control custom-switch'>
+        <input type='checkbox' class='custom-control-input' id='betaEnabled'>
+        <label class='custom-control-label' for='betaEnabled'>Show beta features (may not properly work)</label>
+    </div>
     
     <div style='display: flex'>
-        <button class='btn btn-info' id='checkAll' style='font-size: 0.92rem'>Check all assignments*</button>
-        <button class='btn btn-danger' id='resetBtn' style='font-size: 0.92rem'>Uncheck all assignments</button>
+        <button class='btn btn-info beta' id='checkAll' style='font-size: 0.92rem; width: 94%; display: none'>Check all assignments*</button>
+        <button class='btn btn-danger' id='resetBtn' style='font-size: 0.92rem; width: 100%'>Uncheck all assignments</button>
     </div>
-    <div>
+    <div class='beta'>
         <button class='btn btn-info' id='checkAllBeforeToday'>Check all assignments before today*</button>
     </div>
-    <p>*These features only work in calendar view</p>
+    <p class='beta'>*These features only work in calendar view.</p>
     <br>
+    <h3>Review</h3>
     <p style='text-align: center'>
-        Built with love by<a href='https://joelgrayson.com' target='_blank'>Joel Grayson</a>
         <!-- Links to chrome web store (uses link.joelgrayson.com for link tracking & dynamic url if extension review url ever changes) -->
-        <button class='btn btn-info'><a style='color: white' href='https://link.joelgrayson.com/homework-checker-reviews'>
+        <button class='btn btn-info'><a style='color: white' target='_blank' href='https://link.joelgrayson.com/homework-checker-reviews'>
             Leave a review ⭐      
         </a></button>
+    </p>
+    <p style='text-align: center'>
+        Built with love by<a href='https://joelgrayson.com' target='_blank'>Joel Grayson</a>
     </p>
     
     <script src='main.js'></script>

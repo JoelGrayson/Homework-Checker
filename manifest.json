@@ -1,7 +1,7 @@
 {
     "name": "Homework Checker (Schoology)",
     "description": "Check off assignments in the schoology calendar view.",
-    "version": "3.1",
+    "version": "3.2",
     "manifest_version": 3,
     "background": {
         "service_worker": "alter page/background.js"
