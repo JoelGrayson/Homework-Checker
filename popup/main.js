@@ -31,10 +31,9 @@ document.getElementById('checkAllBeforeToday').addEventListener('click', ()=>{
 //Reset Button
 document.getElementById('resetBtn').addEventListener('click', async e=>{
     let data=await chrome.storage.sync.get(); //current settings
-    data.checkedTasks=[]; //makes list empty
+    data.checkedTasks={}; //makes checkedTasks empty but keeps settings
     chrome.storage.sync.set(data);
-
-    sendMessage({run: 'reload'});
+    sendMessage({run: 'reload'}); //reload page for changes to show
 });
 
 
