@@ -1,8 +1,9 @@
 {
     "name": "Homework Checker (Schoology)",
-    "description": "Check off assignments in the schoology calendar view.",
-    "version": "3.2",
+    "description": "Stay organized. Check off assignments like a todo-list.",
+    "version": "3.3",
     "manifest_version": 3,
+    "author": "Joel Grayson",
     "background": {
         "service_worker": "alter page/background.js"
     },

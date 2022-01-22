@@ -38,7 +38,7 @@ function executeAfterDoneLoading(callback) {
 
 function determineSchoologyPageType() { //checks if page is a schoology calendar page before calling next
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
-    console.log('1. Extension running');
+    // console.log('1. Extension running');
     //Calendar
     const hasSchoologyScripts=document.querySelectorAll(`script[src*='schoology.com']`); //schoology page
     
@@ -54,7 +54,6 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
             let hasCourse=window.location.pathname.match(/\/course\/(\d+)\//);
             if (hasCourse) { //type 2: course materials page
                 let courseID=hasCourse[1];
-                console.log({courseID})
                 executeAfterDoneLoading(()=>{
                     new CoursePage(courseID);
                 })
@@ -305,7 +304,6 @@ class CalendarPage extends SchoologyPage {
         let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
-        console.log(assignmentEl)
         let courseText=assignmentEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
         courseText=removeSpaces(courseText);
         let newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
