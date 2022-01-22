@@ -8,12 +8,19 @@
     background-position: center center;
     background-size: 100% 100%, auto;
 }
+/*
+input[class^="j_check_"] { /* all j_check boxes. specific settings overriden by specific page below
+    cursor: pointer;
+    zoom: 1.2;
+}
+*/
+
 /* Calendar */
 .j_check_cal {
-    zoom: 1.2;
     position: absolute;
-    right: 1px;
-    bottom: 1px;    
+    zoom: 0.8;
+    right: 8px;
+    bottom: 8px;    
     z-index: 11;
 }
 .highlight-green-cal {
@@ -26,9 +33,7 @@
 
 /* Course */
 .j_check_course {
-    zoom: 1.2;
 }
 /* Home */
 .j_check_home {
-    zoom: 1.2;
 }

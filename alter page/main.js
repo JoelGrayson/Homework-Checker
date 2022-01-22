@@ -123,7 +123,7 @@ class SchoologyPage { //abstract class; template for each page
         this.getAssignmentByNamePathEl=getAssignmentByNamePathEl; //from where to search :contains() of an assignment by name
         this.infoToBlockEl=infoToBlockEl;
         this.checkPrev=checkPrev;
-        this.ignoreOldAssignments=ignoreOldAssignments;
+        this.ignoreOldAssignments=ignoreOldAssignments ?? true; //true by default. overridden by user input
 
         /*{
             courses, //'$all' | String of course name
@@ -353,8 +353,7 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             checkPrev: {
                 courses: courseName,
                 time: 'any'
-            },
-            ignoreOldAssignments: true
+            }
         });
         this.courseID=courseID;
         this.courseName=courseName;
@@ -422,8 +421,7 @@ class HomePage extends SchoologyPage {
             checkPrev: {
                 courses: '$all',
                 time: 'any'
-            },
-            ignoreOldAssignments: true
+            }
         });
         let selector=`h4>span`;
         let containerClass='j_check_container';

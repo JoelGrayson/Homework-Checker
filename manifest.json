@@ -15,7 +15,8 @@
                 "alter page/main.js"
             ],
             "css": [
-                "alter page/check off.css"
+                "alter page/main.css",
+                "alter page/checkmark.css"
             ],
             "run_at": "document_end"
         }

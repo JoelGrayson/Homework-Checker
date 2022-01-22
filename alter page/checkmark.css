@@ -1,0 +1,23 @@
+input[class^="j_check_"]::after {
+  content: '';
+  display: block;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 3px;
+}
+
+input[class^="j_check_"]:hover::after {
+  background-color: #dbe6de;
+}
+
+input[class^="j_check_"]:checked::after {
+  background-color: #00bf40;
+  border: 1px solid #077a2d;
+  background-image: url("data:image/svg+xml;utf8,\a             <svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'> {\a                 <path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' /> {} }\a             </svg>");
+}
+/*# sourceMappingURL=checkmark.css.map */
