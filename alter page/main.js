@@ -469,7 +469,7 @@ class HomePage extends SchoologyPage {
                 }
                 this.updateCheckedTasks(this.checkedTasksGlobal);
             }
-        } else {//uncheck
+        } else { //uncheck
             console.log(`Unchecking ${assignmentText}`);
             checkmarkEl.checked=false;
             assignmentEl.classList.remove('highlight-green');
