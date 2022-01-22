@@ -20,38 +20,68 @@ window.addEventListener('load', determineSchoologyPageType, false); //wait for D
 // };
 // />
 
+function executeAfterDoneLoading(callback) {
+    let intervalID=setInterval(()=>{
+        let isLoading=document.querySelector('.upcoming-list>.refresh-wrapper img[alt="Loading"]')!=null;
+        if (isLoading) {
+            // Continue waiting
+            console.log('Loading...')
+        } else {
+            clearInterval(intervalID); //stop interval
+            
+            setTimeout(()=>{ //wait another .01 seconds for assignmentEls to render on DOM
+                callback();
+            }, 10)
+        }
+    }, 100);
+}
+
 function determineSchoologyPageType() { //checks if page is a schoology calendar page before calling next
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
     console.log('1. Extension running');
     //Calendar
     const hasSchoologyScripts=document.querySelectorAll(`script[src*='schoology.com']`); //schoology page
+    
     if (hasSchoologyScripts) { //schoology page (determine which one)
         const hasCalendar=document.querySelector('#fcalendar'); //calendar page
         const urlHasCalendar=window.location.pathname.includes('calendar');
         if (hasCalendar && urlHasCalendar) { //type 1: schoology calendar
             waitForEventsLoaded();
         }
+
         //Not calendar
         else {
             let hasCourse=window.location.pathname.match(/\/course\/(\d+)\//);
             if (hasCourse) { //type 2: course materials page
-                let courseId=hasCourse[1];
-                new CoursePage(courseId);
+                let courseID=hasCourse[1];
+                console.log({courseID})
+                executeAfterDoneLoading(()=>{
+                    new CoursePage(courseID);
+                })
             } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
                 let assignmentsAreLoading=true;
-                let intervalId=setInterval(()=>{ //wait until loading gone icon to insert new HomePage();
-                    let assignmentsAreLoading=document.querySelector('.upcoming-list>.refresh-wrapper')!=null; //not done loading assignments
-                    if (!assignmentsAreLoading) { //done loading
-                        new HomePage();
-                        clearInterval(intervalId);
-                    }
-                    // Otherwise, keep checking every tenth of second
-                }, 100)
+                executeAfterDoneLoading(()=>{
+                    new HomePage();
+                });
             } else { //Non-schoology-related page
                 //pass
             }
         }
     }
+}
+
+function removeSpaces(input) { //for some reason, calendar page and home page have different course names spacing. 
+    // Different spacing below:
+    // "Algebra II (H): ALGEBRA II H - G"
+    // "Algebra II (H) : ALGEBRA II H - G "
+
+    let str='';
+    for (let character of input) {
+        if (character!==' ') {
+            str+=character;
+        }
+    }
+    return str;
 }
 
 //<h1> CALENDAR
@@ -71,7 +101,7 @@ function waitForEventsLoaded() { //waits for calendar's events to load before ca
 }
 
 class SchoologyPage { //abstract class; template for each page
-    constructor({pageType, getAssignmentByNamePathEl, infoToBlockEl, checkPrev}) {
+    constructor({pageType, getAssignmentByNamePathEl, infoToBlockEl, checkPrev, ignoreOldAssignments}) {
         chrome.storage.sync.get('settings', ({settings})=>{
             if (settings.showCheckmarks==='onHover') {
                 console.log('Only show checkmark on hover');
@@ -94,6 +124,8 @@ class SchoologyPage { //abstract class; template for each page
         this.getAssignmentByNamePathEl=getAssignmentByNamePathEl; //from where to search :contains() of an assignment by name
         this.infoToBlockEl=infoToBlockEl;
         this.checkPrev=checkPrev;
+        this.ignoreOldAssignments=ignoreOldAssignments;
+
         /*{
             courses, //'$all' | String of course name
             time //'any' | 'future'
@@ -131,7 +163,8 @@ class SchoologyPage { //abstract class; template for each page
                     let assignments=this.checkedTasksGlobal[course];
                     for (let assignmentEl of assignments) {
                         let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
-                        this.j_check(blockEl, false);
+                        if (infoEl!=='No matches')
+                            this.j_check(blockEl, false);
                     }
                 }
             } else if (courses==='$all' && time==='future') { //not being used, potential if not prev assignments
@@ -143,7 +176,8 @@ class SchoologyPage { //abstract class; template for each page
                     console.log('Assignments', assignments);
                     for (let assignmentEl of assignments) {
                         let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
-                        this.j_check(blockEl, false);
+                        if (infoEl!=='No matches')
+                            this.j_check(blockEl, false);
                     }
                 }
             }
@@ -186,16 +220,19 @@ class SchoologyPage { //abstract class; template for each page
                 }
             }
         } else { //returns if no matches 👎
-            console.error(`No elements matched ${assignmentName}`, {
-                errorInfo: {
-                    getAssignmentByNamePathEl: this.getAssignmentByNamePathEl,
-                    query,
-                    queryRes,
-                    infoEl
-                }
-            }, 'This error may be caused by old assignments');
-            return 'No matches';
+            if (!this.ignoreOldAssignments) {
+                console.error(`No elements matched ${assignmentName}`, {
+                    errorInfo: {
+                        getAssignmentByNamePathEl: this.getAssignmentByNamePathEl,
+                        query,
+                        queryRes,
+                        infoEl
+                    }
+                }, 'This error may be caused by old assignments');
+            }
+            return ['No matches', 'No matches'];
         }
+        
         let blockEl=this.infoToBlockEl(infoEl); //block (has styles)
         return [infoEl, blockEl];
     }
@@ -268,7 +305,9 @@ class CalendarPage extends SchoologyPage {
         let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
         let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
+        console.log(assignmentEl)
         let courseText=assignmentEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
+        courseText=removeSpaces(courseText);
         let newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
 
         if (newState) { //no highlight green already
@@ -304,9 +343,11 @@ class CalendarPage extends SchoologyPage {
 }
 
 class CoursePage extends SchoologyPage { //materials page (one course)
-    constructor(courseId) {
+    constructor(courseID) {
         let containerPath=`#course-events .upcoming-list .upcoming-events .upcoming-list`;
         let courseName=document.querySelector('#center-top>.page-title').innerText; //grabs course title
+        courseName=removeSpaces(courseName);
+
         super({
             pageType: 'course',
             getAssignmentByNamePathEl: `${containerPath}>div[data-start]`, //searches inside assignment
@@ -314,9 +355,10 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             checkPrev: {
                 courses: courseName,
                 time: 'any'
-            }
+            },
+            ignoreOldAssignments: true
         });
-        this.courseId=courseId;
+        this.courseID=courseID;
         this.courseName=courseName;
 
         this.addCheckmarks({
@@ -354,7 +396,6 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             }
         } else { //uncheck
             console.log(`Unchecking ${assignmentText}`);
-            //Uncheck
             checkmarkEl.checked=false;
             assignmentEl.classList.remove('highlight-green');
             
@@ -378,17 +419,18 @@ class HomePage extends SchoologyPage {
     constructor() {
         super({
             pageType: 'home',
-            getAssignmentByNamePathEl: 'div.upcoming-list>div',
+            getAssignmentByNamePathEl: 'div.upcoming-events-wrapper>div.upcoming-list>div', //upcoming (also overdue assignments)
             infoToBlockEl: el=>el,
             checkPrev: {
                 courses: '$all',
                 time: 'any'
-            }
+            },
+            ignoreOldAssignments: true
         });
         let selector=`h4>span`;
         let containerClass='j_check_container';
         this.addCheckmarks({
-            assignmentsContainer: document.querySelector('div.upcoming-list'),
+            assignmentsContainer: document.querySelector('div.upcoming-events-wrapper>div.upcoming-list'),
             customMiddleScript: (checkEl, assignmentEl)=>{
                 if (assignmentEl.classList.contains('date-header'))
                     return 'continue';
@@ -409,6 +451,8 @@ class HomePage extends SchoologyPage {
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
         let assignmentText=assignmentEl.querySelector('a').innerText;
         let courseText=assignmentEl.querySelector('h4>span').ariaLabel; //name of course based on aria-label of assignmentEl's <h4>'s <span>'s <div>
+        courseText=removeSpaces(courseText);
+        console.log({courseText, assignmentEl});
 
         if (newState) { //check
             console.log(`Checking ${assignmentText}`);
@@ -431,14 +475,14 @@ class HomePage extends SchoologyPage {
             assignmentEl.classList.remove('highlight-green');
             
             try {
-                this.checkedTasksGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
-                    this.checkedTasksGlobal[this.courseName].indexOf(assignmentText)
+                this.checkedTasksGlobal[courseText].pop( //remove checkedTaskGlobal from list
+                    this.checkedTasksGlobal[courseText].indexOf(assignmentText)
                 );
                 this.updateCheckedTasks(this.checkedTasksGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
-                    this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
+                    this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(assignmentText));
                     this.updateCheckedTasks(this.checkedTasksGlobal);
                 }, 1000);
             }

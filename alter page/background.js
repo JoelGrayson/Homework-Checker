@@ -15,8 +15,8 @@ chrome.storage:
         showCheckmarks: 'onHover' | 'always'
     },
     checkedTasks: {
-        '$class': ['checked assignment 1', 'assignment 2'],
-        'english': ['read macbeth', 'study for grammar quiz']
+        '$classWithNoSpaces': ['checked assignment 1', 'assignment 2'], //no spaces because removeSpaces()
+        'englishII': ['read macbeth', 'study for grammar quiz']
     }
 }
 */
