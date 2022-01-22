@@ -15,9 +15,22 @@ input[class^="j_check_"]:hover::after {
   background-color: #dbe6de;
 }
 
+input[class^="j_check_"]:active::after {
+  background-color: #a6ccac;
+}
+
 input[class^="j_check_"]:checked::after {
-  background-color: #00bf40;
+  background-color: #05d74b;
   border: 1px solid #077a2d;
-  background-image: url("data:image/svg+xml;utf8,\a             <svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'> {\a                 <path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' /> {} }\a             </svg>");
+  border-radius: 3px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'><path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='13' stroke-linecap='round' stroke-linejoin='round' /></svg>");
+}
+
+input[class^="j_check_"]:checked:hover::after {
+  background-color: #01a036;
+}
+
+input[class^="j_check_"]:checked:active::after {
+  background-color: #018f30;
 }
 /*# sourceMappingURL=checkmark.css.map */

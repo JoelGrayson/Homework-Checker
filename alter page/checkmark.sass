@@ -12,15 +12,24 @@ input[class^="j_check_"]
         border: 1px solid black
         border-radius: 3px
 
-    &:hover
+    &:hover //little darker onHover
         &::after
             background-color: #dbe6de
     
-    &:checked
+    &:active //more darker when user clicking (active)
         &::after
-            background-color: #00bf40
+            background-color: #a6ccac
+    
+    &:checked
+        &::after //checkmark
+            background-color: #05d74b
             border: 1px solid #077a2d
-            background-image: url("data:image/svg+xml;utf8,
-            <svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'>
-                <path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' />
-            </svg>")
+            border-radius: 3px
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'><path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='13' stroke-linecap='round' stroke-linejoin='round' /></svg>");
+        &:hover
+            &::after
+                background-color: #01a036
+        &:active
+            &::after
+                background-color: #018f30
+        
