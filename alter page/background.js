@@ -1,4 +1,7 @@
 chrome.runtime.onInstalled.addListener(()=>{
+    // chrome.tabs.create({
+    //     url: 'onboarding/index.html'
+    // })
     chrome.storage.sync.set({
         settings: {
             showCheckmarks: 'always', //'onHover' | 'always'
