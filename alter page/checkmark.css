@@ -9,6 +9,7 @@ input[class^="j_check_"]::after {
   background-color: white;
   border: 1px solid black;
   border-radius: 3px;
+  cursor: pointer;
 }
 
 input[class^="j_check_"]:hover::after {

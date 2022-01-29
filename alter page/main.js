@@ -274,6 +274,40 @@ class CalendarPage extends SchoologyPage {
             },
             locateElToAppendCheckmarkTo: el=>el
         });
+
+        //When changing months, reload page
+        document.querySelector('span.fc-button-prev').addEventListener('click', reloadToCorrectMonthURL); //previous month button
+        document.querySelector('span.fc-button-next').addEventListener('click', reloadToCorrectMonthURL); //next month button
+    
+        function reloadToCorrectMonthURL() { //looks at `December 2021` or whatever the date is in text, converts to URL, and reloads page to that URL
+            let elText=document.querySelector('.fc-header-title').innerText;
+            let [monthName, year]=elText.split(' ');
+            let month;
+
+            switch (monthName) {
+                case 'January': month='01'; break;
+                case 'February': month='02'; break;
+                case 'March': month='03'; break;
+                case 'April': month='04'; break;
+                case 'May': month='05'; break;
+                case 'June': month='06'; break;
+                case 'July': month='07'; break;
+                case 'August': month='08'; break;
+                case 'September': month='09'; break;
+                case 'October': month='10'; break;
+                case 'November': month='11'; break;
+                case 'December': month='12'; break;
+                default: console.error('Unknown month?', monthName)
+            }
+            
+            let dateURL=`${year}-${month}`;
+
+            console.log({dateURL})
+
+            let oldPathname=window.location.pathname.match(/(.*\/)\d{4}-\d{2}/)[1]; //removes last ####-## part of URL
+            let newPathname=`${oldPathname}${dateURL}`;
+            window.location.pathname=newPathname;
+        }
     }
 
     checkAllAssignments() {
