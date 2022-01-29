@@ -204,7 +204,7 @@ class SchoologyPage { //abstract class; template for each page
     }
 
     getAssignmentByName(assignmentName) { //returns DOMElement based on given string
-        let query=`${this.getAssignmentByNamePathEl}:contains('${   assignmentName.replace(`'`, `\\'`) /* escape quote marks */  }')`;
+        let query=`${this.getAssignmentByNamePathEl}:contains('${   assignmentName.replaceAll(`'`, `\\'`) /* escape quote marks */  }')`;
         let queryRes=jQuery(query); //has info (course & event), identifier
         //jQuery's :contains() will match elements where assignmentName is a substring of the assignment. else if below handles overlaps
         
