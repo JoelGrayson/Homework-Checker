@@ -35,7 +35,7 @@ done
 #* || Copying Folders
 for folder in */ #only folders in this directory
 do
-    if [[ "$folder" == "private/" || "$folder" == "demo/" ]] #ignored folders
+    if [[ "$folder" == "private/" || "$folder" == "branding/" ]] #ignored folders
     then
         echo "Ignoring $folder"
     else
