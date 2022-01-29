@@ -1,7 +1,4 @@
 chrome.runtime.onInstalled.addListener(()=>{
-    // chrome.tabs.create({
-    //     url: 'onboarding/index.html'
-    // })
     chrome.storage.sync.set({
         settings: {
             showCheckmarks: 'always', //'onHover' | 'always'
@@ -9,6 +6,13 @@ chrome.runtime.onInstalled.addListener(()=>{
         },
         checkedTasks: {} //object with keys of courseNames and values of list of strings of assignments already checked, all other assignments remain unchecked
     });
+});
+chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and let know updated
+    console.log({details});
+    chrome.tabs.create({ //create new tab
+        url: 'onboarding/updated.html'
+    });
+    chrome.runtime.reload();
 });
 
 /*
