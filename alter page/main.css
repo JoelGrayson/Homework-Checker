@@ -8,12 +8,6 @@
     background-position: center center;
     background-size: 100% 100%, auto;
 }
-/*
-input[class^="j_check_"] { /* all j_check boxes. specific settings overriden by specific page below
-    cursor: pointer;
-    zoom: 1.2;
-}
-*/
 
 /* Calendar */
 .j_check_cal {
