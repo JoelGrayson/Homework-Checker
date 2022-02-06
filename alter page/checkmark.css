@@ -1,4 +1,4 @@
-input[class^="j_check_"]::after {
+input[class^="j_check_"]::before {
   content: '';
   display: block;
   position: relative;
@@ -12,26 +12,67 @@ input[class^="j_check_"]::after {
   cursor: pointer;
 }
 
-input[class^="j_check_"]:hover::after {
+input[class^="j_check_"]::after {
+  content: '';
+  width: calc(6px + 15px + 6px);
+  height: calc(6px + 15px + 6px);
+  position: absolute;
+  top: calc(-1 * 6px);
+  left: calc(-1 * 6px);
+}
+
+input[class^="j_check_"]:hover::before {
   background-color: #dbe6de;
 }
 
-input[class^="j_check_"]:active::after {
+input[class^="j_check_"]:active::before {
   background-color: #a6ccac;
 }
 
-input[class^="j_check_"]:checked::after {
+input[class^="j_check_"]:checked::before {
   background-color: #05d74b;
   border: 1px solid #077a2d;
   border-radius: 3px;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'><path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='13' stroke-linecap='round' stroke-linejoin='round' /></svg>");
 }
 
-input[class^="j_check_"]:checked:hover::after {
+input[class^="j_check_"]:checked:hover::before {
   background-color: #01a036;
 }
 
-input[class^="j_check_"]:checked:active::after {
+input[class^="j_check_"]:checked:active::before {
   background-color: #018f30;
+}
+
+input[class^="j_check_"] .highlight-green {
+  /* Green & cross through center */
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 15 -5 L -5 15 L 15 15 L 15 -5 L -5 -5 L -5 15 Z' fill='rgb(115, 252, 127)' stroke='green' /></svg>");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 100% 100%, auto;
+}
+
+.j_check_cal {
+  position: absolute;
+  zoom: 0.8;
+  right: 8px;
+  bottom: 8px;
+  z-index: 11;
+}
+
+.highlight-green-cal {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  position: absolute;
+  opacity: 0.6;
+}
+
+.j_check_course {
+  zoom: 0.93;
+}
+
+.j_check_home {
+  zoom: 0.93;
 }
 /*# sourceMappingURL=checkmark.css.map */

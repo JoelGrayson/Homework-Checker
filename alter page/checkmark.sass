@@ -1,36 +1,86 @@
+//*|| All J_Checkmarks
+
+// Checkmark settings
+$size: 15px //checkmark
+$p: 6px //padding around checkmark that is clickable
+
 input[class^="j_check_"]
-    &::after //covers original
+    // position: relative //so that after is in center
+    &::before //checkmark (covers original)
         content: ''
         display: block
         position: relative
         top: 0
         left: 0
 
-        width: 15px
-        height: 15px
+        width: $size
+        height: $size
         background-color: white
         border: 1px solid black
         border-radius: 3px
         cursor: pointer
 
+    &::after //clickable area (greater than checkmark)
+        content: ''
+        width: calc(#{$p} + #{$size} + #{$p})
+        height: calc(#{$p} + #{$size} + #{$p})
+        position: absolute
+        //offset width
+        top: calc(-1 * #{$p})
+        left: calc(-1 * #{$p})
+
+    
     &:hover //little darker onHover
-        &::after
+        &::before
             background-color: #dbe6de
     
     &:active //more darker when user clicking (active)
-        &::after
+        &::before
             background-color: #a6ccac
     
     &:checked
-        &::after //checkmark
+        &::before //checkmark
             background-color: #05d74b
             border: 1px solid #077a2d
             border-radius: 3px
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'><path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='13' stroke-linecap='round' stroke-linejoin='round' /></svg>");
         &:hover
-            &::after
+            &::before
                 background-color: #01a036
         &:active
-            &::after
+            &::before
                 background-color: #018f30
         
+    .highlight-green
+        /* Green & cross through center */
+        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 15 -5 L -5 15 L 15 15 L 15 -5 L -5 -5 L -5 15 Z' fill='rgb(115, 252, 127)' stroke='green' /></svg>")
+        background-repeat: no-repeat
+        background-position: center center
+        background-size: 100% 100%, auto
+
+
+
+//*|| J_Check Specific Page Type
+//* Calendar
+.j_check_cal
+    position: absolute
+    zoom: 0.8
+    right: 8px
+    bottom: 8px    
+    z-index: 11
+
+.highlight-green-cal
+    width: 100%
+    height: 100%
+    z-index: 10
+    position: absolute
+    opacity: 0.6
+
+//* Course
+.j_check_course
+    zoom: 0.93
+
+//* Home
+.j_check_home
+    zoom: 0.93
+
