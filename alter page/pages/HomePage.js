@@ -11,6 +11,8 @@ class HomePage extends SchoologyPage {
             multipleAssignmentContainers: true
         });
 
+        collapseOverdue();
+
         for (let containerSelector of containerSelectors) {
             let selector=`h4>span`;
             let containerClass='j_check_container';

@@ -2,7 +2,8 @@ chrome.runtime.onInstalled.addListener(()=>{
     chrome.storage.sync.set({
         settings: {
             showCheckmarks: 'always', //'onHover' | 'always'
-            betaEnabled: false //shows beta features
+            betaEnabled: false, //shows beta features
+            overdueCollapsed: false, //when true, overdue section is collapsed
         },
         checkedTasks: {} //object with keys of courseNames and values of list of strings of assignments already checked, all other assignments remain unchecked
     });
@@ -14,6 +15,12 @@ chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and l
     });
     chrome.runtime.reload();
 });
+
+setInterval(()=>{
+    chrome.storage.sync.get('settings', settings=>{
+        console.log(settings);
+    });
+}, 1000);
 
 /*
 chrome.storage:

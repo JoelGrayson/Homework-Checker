@@ -1,7 +1,7 @@
 {
     "name": "Homework Checker (Schoology)",
     "description": "Stay organized. Check off assignments like a todo-list.",
-    "version": "3.5",
+    "version": "3.6",
     "manifest_version": 3,
     "author": "Joel Grayson",
     "background": {
@@ -16,11 +16,13 @@
                 "alter page/pages/SchoologyPage.js",
                 "alter page/pages/CalendarPage.js",
                 "alter page/pages/CoursePage.js",
+                "alter page/pages/collapseOverdue.js",
                 "alter page/pages/HomePage.js",
                 "alter page/main.js"
             ],
             "css": [
-                "alter page/injected/checkmark.css"
+                "alter page/injected/checkmark.css",
+                "alter page/injected/style.css"
             ],
             "run_at": "document_end"
         }
