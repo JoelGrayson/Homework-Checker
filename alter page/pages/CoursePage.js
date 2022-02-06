@@ -45,7 +45,8 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             console.log(`Checking ${assignmentText}`);
             //Check
             checkmarkEl.checked=true;
-            assignmentEl.classList.add('highlight-green');
+            const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
+            assignmentEl.insertBefore(highlightGreenEl, assignmentEl.firstChild); //insert as first element (before firstElement)
            
             if (storeInChrome) {
                 if (this.courseName in this.checkedTasksGlobal) { //already exists, so append
@@ -59,7 +60,8 @@ class CoursePage extends SchoologyPage { //materials page (one course)
         } else { //uncheck
             console.log(`Unchecking ${assignmentText}`);
             checkmarkEl.checked=false;
-            assignmentEl.classList.remove('highlight-green');
+            const highlightGreenEl=assignmentEl.querySelector('.highlight-green'); //removes svg
+            assignmentEl.removeChild(highlightGreenEl);
             
             try {
                 this.checkedTasksGlobal[this.courseName].pop( //remove checkedTaskGlobal from list

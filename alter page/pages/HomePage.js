@@ -40,7 +40,8 @@ class HomePage extends SchoologyPage {
             animate=false //shows animation when checking
         }
     }) {
-        const pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
+        console.log({assignmentEl})
+        const pHighlight=!!assignmentEl.querySelector('.highlight-green'); //based on classList of assignmentEl
         const newState=forcedState ?? !pHighlight; //opposite when checking
 
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
@@ -53,7 +54,10 @@ class HomePage extends SchoologyPage {
             console.log(`Checking '${assignmentText}'`);
 
             checkmarkEl.checked=true;
-            assignmentEl.classList.add('highlight-green');
+            const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
+            const parent=assignmentEl.querySelector('h4');
+            parent.insertBefore(highlightGreenEl, parent.firstChild); //insert as first element (before firstElement)
+            assignmentEl.querySelector('h4>span').style.position='relative'; //so that text above checkmark
            
             if (storeInChrome) {
                 if (courseText in this.checkedTasksGlobal) { //already exists, so append
@@ -67,7 +71,8 @@ class HomePage extends SchoologyPage {
         } else { //uncheck
             console.log(`Unchecking '${assignmentText}'`);
             checkmarkEl.checked=false;
-            assignmentEl.classList.remove('highlight-green');
+            const toRemove=assignmentEl.querySelector('.highlight-green');
+            toRemove.parentNode.removeChild(toRemove);
             
             try {
                 this.checkedTasksGlobal[courseText].pop( //remove checkedTaskGlobal from list

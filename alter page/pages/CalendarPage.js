@@ -110,12 +110,9 @@ class CalendarPage extends SchoologyPage {
         if (newState) { //no highlight green already
             console.log(`Checking ${assignmentText}`);
             //Check
-            checkmarkEl.checked=true;
-            let highlightGreen=document.createElement('div');
-            highlightGreen.classList.add('highlight-green');
-            highlightGreen.classList.add(`highlight-green-${this.pageType}`);
-            
-            assignmentEl.insertBefore(highlightGreen, assignmentEl.firstChild);
+            checkmarkEl.checked=true;        
+            const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
+            assignmentEl.insertBefore(highlightGreenEl, assignmentEl.firstChild); //insert as first element (before firstElement)
             
             if (storeInChrome) {
                 if (courseText in this.checkedTasksGlobal) { //already exists, so append
