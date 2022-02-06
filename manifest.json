@@ -11,11 +11,16 @@
         {
             "matches": ["<all_urls>"],
             "js": [
-                "alter page/jquery.min.js",
+                "alter page/injected/jquery.min.js",
+
+                "alter page/pages/SchoologyPage.js",
+                "alter page/pages/CalendarPage.js",
+                "alter page/pages/CoursePage.js",
+                "alter page/pages/HomePage.js",
                 "alter page/main.js"
             ],
             "css": [
-                "alter page/checkmark.css"
+                "alter page/injected/checkmark.css"
             ],
             "run_at": "document_end"
         }
