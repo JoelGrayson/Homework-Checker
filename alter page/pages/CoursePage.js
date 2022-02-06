@@ -33,11 +33,11 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             animate=false //shows animation when checking
         }
     }) { //forceState forces the check to be true/false
-        let pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
-        let newState=forcedState ?? !pHighlight; //opposite when checking
+        const pHighlight=!!assignmentEl.querySelector('.highlight-green'); //based on classList of assignmentEl
+        const newState=forcedState ?? !pHighlight; //opposite when checking
 
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
-        let assignmentText=assignmentEl.querySelector('a').innerText;
+        const assignmentText=assignmentEl.querySelector('a').innerText;
         
         console.log({newHighlight: newState, pHighlight, checkmarkEl});
 
@@ -46,8 +46,10 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             //Check
             checkmarkEl.checked=true;
             const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
-            assignmentEl.insertBefore(highlightGreenEl, assignmentEl.firstChild); //insert as first element (before firstElement)
-           
+            assignmentEl.style.position='relative'; //for green rect to be bound to assignmentEl
+            assignmentEl.querySelector('h4').style.position='relative'; //so that text above checkmark
+            assignmentEl.insertBefore(highlightGreenEl, assignmentEl.firstChild); //insert as first element (before firstChild)
+ 
             if (storeInChrome) {
                 if (this.courseName in this.checkedTasksGlobal) { //already exists, so append
                     this.checkedTasksGlobal[this.courseName].push(assignmentText);
@@ -60,9 +62,9 @@ class CoursePage extends SchoologyPage { //materials page (one course)
         } else { //uncheck
             console.log(`Unchecking ${assignmentText}`);
             checkmarkEl.checked=false;
-            const highlightGreenEl=assignmentEl.querySelector('.highlight-green'); //removes svg
-            assignmentEl.removeChild(highlightGreenEl);
-            
+            const toRemove=assignmentEl.querySelector('.highlight-green');
+            toRemove.parentNode.removeChild(toRemove);            
+
             try {
                 this.checkedTasksGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
                     this.checkedTasksGlobal[this.courseName].indexOf(assignmentText)

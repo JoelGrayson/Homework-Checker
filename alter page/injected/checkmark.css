@@ -14,6 +14,11 @@
   left: 0;
 }
 
+.highlight-green-course {
+  top: 0;
+  left: 0;
+}
+
 input[class^="j_check_"]::before {
   content: '';
   display: block;

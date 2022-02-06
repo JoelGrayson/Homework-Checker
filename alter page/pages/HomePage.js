@@ -56,8 +56,8 @@ class HomePage extends SchoologyPage {
             checkmarkEl.checked=true;
             const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
             const parent=assignmentEl.querySelector('h4');
-            parent.insertBefore(highlightGreenEl, parent.firstChild); //insert as first element (before firstElement)
             assignmentEl.querySelector('h4>span').style.position='relative'; //so that text above checkmark
+            parent.insertBefore(highlightGreenEl, parent.firstChild); //insert as first element (before firstElement)
            
             if (storeInChrome) {
                 if (courseText in this.checkedTasksGlobal) { //already exists, so append
