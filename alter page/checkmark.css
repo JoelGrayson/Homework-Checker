@@ -1,3 +1,11 @@
+.highlight-green {
+  /* Green & cross through center */
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 15 -5 L -5 15 L 15 15 L 15 -5 L -5 -5 L -5 15 Z' fill='rgb(115, 252, 127)' stroke='green' /></svg>");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 100% 100%, auto;
+}
+
 input[class^="j_check_"]::before {
   content: '';
   display: block;
@@ -44,14 +52,6 @@ input[class^="j_check_"]:checked:active::before {
   background-color: #018f30;
 }
 
-input[class^="j_check_"] .highlight-green {
-  /* Green & cross through center */
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 15 -5 L -5 15 L 15 15 L 15 -5 L -5 -5 L -5 15 Z' fill='rgb(115, 252, 127)' stroke='green' /></svg>");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 100% 100%, auto;
-}
-
 .j_check_cal {
   position: absolute;
   zoom: 0.8;
@@ -74,5 +74,6 @@ input[class^="j_check_"] .highlight-green {
 
 .j_check_home {
   zoom: 0.93;
+  position: relative;
 }
 /*# sourceMappingURL=checkmark.css.map */

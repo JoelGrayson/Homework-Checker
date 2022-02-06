@@ -1,11 +1,17 @@
-//*|| All J_Checkmarks
+//*|| Assignment
+.highlight-green
+    /* Green & cross through center */
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 15 -5 L -5 15 L 15 15 L 15 -5 L -5 -5 L -5 15 Z' fill='rgb(115, 252, 127)' stroke='green' /></svg>")
+    background-repeat: no-repeat
+    background-position: center center
+    background-size: 100% 100%, auto
 
-// Checkmark settings
+
+//*|| All J_Checkmarks
 $size: 15px //checkmark
 $p: 6px //padding around checkmark that is clickable
 
 input[class^="j_check_"]
-    // position: relative //so that after is in center
     &::before //checkmark (covers original)
         content: ''
         display: block
@@ -50,17 +56,10 @@ input[class^="j_check_"]
         &:active
             &::before
                 background-color: #018f30
-        
-    .highlight-green
-        /* Green & cross through center */
-        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'> <path d='M 15 -5 L -5 15 L 15 15 L 15 -5 L -5 -5 L -5 15 Z' fill='rgb(115, 252, 127)' stroke='green' /></svg>")
-        background-repeat: no-repeat
-        background-position: center center
-        background-size: 100% 100%, auto
 
 
 
-//*|| J_Check Specific Page Type
+//*|| Specific Page J_Checkmarks
 //* Calendar
 .j_check_cal
     position: absolute
@@ -81,6 +80,7 @@ input[class^="j_check_"]
     zoom: 0.93
 
 //* Home
-.j_check_home
+.j_check_home //has .j_check_container
     zoom: 0.93
+    position: relative //so that after is in center
 
