@@ -81,12 +81,24 @@ class CalendarPage extends SchoologyPage {
             if (beforeToday) { //before today
                 let assignmentEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
                 if (assignmentEl!=null)
-                    this.j_check(assignmentEl, true, true); //forcedState is true
+                    this.j_check({ //forcedState is true
+                        assignmentEl,
+                        forcedState: true,
+                        options: {
+                            storeInChrome: true
+                        }
+                    });
             }
         }
     }
-
-    j_check(assignmentEl, storeInChrome=true, forcedState) { //checks/unchecks passed in element
+    j_check({
+        assignmentEl,
+        forcedState=null,
+        options: {
+            storeInChrome=true,
+            animate=false //shows animation when checking
+        }
+    }) { //checks/unchecks passed in element
         //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior assignments from storage. is true all other times
         let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
         const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);

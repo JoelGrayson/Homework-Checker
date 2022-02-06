@@ -32,7 +32,14 @@ class HomePage extends SchoologyPage {
             });
         }
     }
-    j_check(assignmentEl, storeInChrome=true, forcedState) {
+    j_check({
+        assignmentEl,
+        forcedState=null,
+        options: {
+            storeInChrome=true,
+            animate=false //shows animation when checking
+        }
+    }) {
         const pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
         const newState=forcedState ?? !pHighlight; //opposite when checking
 

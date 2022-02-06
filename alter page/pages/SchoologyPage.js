@@ -66,7 +66,12 @@ class SchoologyPage { //abstract class; template for each page
                     for (let assignmentEl of assignments) {
                         let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
                         if (infoEl!=='No matches')
-                            this.j_check(blockEl, false);
+                            this.j_check({
+                                assignmentEl: blockEl,
+                                options: { //don't store when initially checking (because checks are from previous state)
+                                    storeInChrome: false,
+                                }
+                            });
                     }
                 }
             } else if (courses==='$all' && time==='future') { //not being used, potential if not prev assignments
@@ -79,7 +84,12 @@ class SchoologyPage { //abstract class; template for each page
                     for (let assignmentEl of assignments) {
                         let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
                         if (infoEl!=='No matches')
-                            this.j_check(blockEl, false);
+                            this.j_check({
+                                assignmentEl: blockEl,
+                                options: {
+                                    storeInChrome: false,
+                                }
+                            })
                     }
                 }
             }
@@ -96,7 +106,14 @@ class SchoologyPage { //abstract class; template for each page
             checkEl.className=`j_check_${this.pageType}`;
             checkEl.type='checkbox';
             checkEl.addEventListener('change', ()=>{
-                this.j_check(assignmentEl);
+                //animate because user clicking
+                this.j_check({
+                    assignmentEl,
+                    options: {
+                        storeInChrome: true,
+                        animate: false //shows animation when checking
+                    }
+                });
             });
             let toRun=customMiddleScript(checkEl, assignmentEl); //returns string to evaluate (rarely used)
             if (toRun==='continue')
@@ -155,7 +172,15 @@ class SchoologyPage { //abstract class; template for each page
         return [infoEl, blockEl];
     }
 
-    j_check() {} //polymorphism allows this function to be specialized among each SchoologyPage subclass
+    j_check({ //polymorphism allows this function to be specialized among each SchoologyPage subclass. However, it is called from this SchoologyPage
+        // Below are the conventional inputs
+        assignmentEl,
+        forcedState=null, //if null, j_check toggles. if true/false, it forces into that state
+        options: {
+            storeInChrome=true,
+            animate=false //shows animation when checking
+        }
+    }) {}
 
     updateCheckedTasks(checkedTasksGlobal) { //updates chrome's storage with checked tasks parameter
         console.log('Updating to ', checkedTasksGlobal);

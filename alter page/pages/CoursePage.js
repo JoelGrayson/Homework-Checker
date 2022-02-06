@@ -25,7 +25,14 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             locateElToAppendCheckmarkTo: el=>el.firstChild
         });
     }
-    j_check(assignmentEl, storeInChrome=true, forcedState) { //forceState forces the check to be true/false
+    j_check({
+        assignmentEl,
+        forcedState=null,
+        options: {
+            storeInChrome=true,
+            animate=false //shows animation when checking
+        }
+    }) { //forceState forces the check to be true/false
         let pHighlight=assignmentEl.classList.contains('highlight-green'); //based on classList of assignmentEl
         let newState=forcedState ?? !pHighlight; //opposite when checking
 
