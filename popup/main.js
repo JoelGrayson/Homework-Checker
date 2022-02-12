@@ -1,18 +1,27 @@
 const onlyShowOnHoverEl=document.getElementById('onlyShowOnHover');
+const overdueCollapsed=document.getElementById('overdueCollapsed');
+const showCheckmarksValues={ //enum of valid values
+    always: 'always',
+    onHover: 'onHover'
+};
+
 const betaEnabledEl=document.getElementById('betaEnabled');
 
-(async ()=>{ //Check the click if true or not
+(async ()=>{ //Assigns switches the proper checked/unchecked values (fetches from chrome storage and reflects changes on switches on/off)
     let data=await chrome.storage.sync.get();
     switch (data.settings.showCheckmarks) {
-        case 'always':
+        case showCheckmarksValues.always:
             onlyShowOnHoverEl.checked=false;
             break;
-        case 'hover':
+        case showCheckmarksValues.onHover:
             onlyShowOnHoverEl.checked=true;
             break;
         default:
-            throw new Error('Unknown chrome.storage.settings.showCheckmarks value:', data.settings.showCheckmarks);
+            throw new Error('Unknown chrome.storage.settings.showCheckmarks value:'+JSON.stringify(data.settings.showCheckmarks)); //JSON.stringify just in case it is an object
     }
+    
+    overdueCollapsed.checked=data.settings.overdueCollapsed;
+    console.log(data.settings.overdueCollapsed)
 
     if (data.settings.betaEnabled) { //if betaEnabled
         betaEnabledEl.checked=true;
@@ -24,7 +33,15 @@ const betaEnabledEl=document.getElementById('betaEnabled');
 
 onlyShowOnHoverEl.addEventListener('change', async ()=>{
     let data=await chrome.storage.sync.get(); //get current settings
-    data.settings.showCheckmarks=(onlyShowOnHoverEl.checked?'onHover':'always');
+    data.settings.showCheckmarks=(onlyShowOnHoverEl.checked?showCheckmarksValues.onHover:showCheckmarksValues.always);
+    chrome.storage.sync.set(data);
+
+    sendMessage({run: 'reload'}); //reloads when checking
+});
+
+overdueCollapsed.addEventListener('change', async ()=>{
+    let data=await chrome.storage.sync.get(); //get current settings
+    data.settings.overdueCollapsed=!!overdueCollapsed.checked;
     chrome.storage.sync.set(data);
 
     sendMessage({run: 'reload'}); //reloads when checking
@@ -56,11 +73,15 @@ betaEnabledEl.addEventListener('change', async ()=>{
     let data=await chrome.storage.sync.get();
     data.settings.betaEnabled=currentStatus;
     chrome.storage.sync.set(data);
-    location.reload(); //reload for new DOM render
+    if (!currentStatus) {
+        setTimeout(()=>{ //after some time for chrome.sync to work
+            location.reload(); //reload for new DOM render
+        }, 500);
+    }
 })
 
 
-//Reset Button
+//Uncheck all (reset) Button
 document.getElementById('resetBtn').addEventListener('click', async e=>{
     let data=await chrome.storage.sync.get(); //current settings
     data.checkedTasks={}; //makes checkedTasks empty but keeps settings

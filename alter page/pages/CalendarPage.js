@@ -68,7 +68,13 @@ class CalendarPage extends SchoologyPage {
         for (let el of elementsByDate) {
             let assignmentEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
             if (assignmentEl!=null)
-                this.j_check(assignmentEl, true, true); //forcedState is true
+                this.j_check({
+                    assignmentEl,
+                    forcedState: true,
+                    options: {
+                        storeInChrome: true
+                    }
+                }); //forcedState is true
         }
     }
 
