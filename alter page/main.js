@@ -20,10 +20,12 @@ window.addEventListener('load', determineSchoologyPageType, false); //wait for D
 // };
 // />
 
-function executeAfterDoneLoading(callback) { //executes callback after page is done loading
+function executeAfterDoneLoading(
+    callback, //executed after
+    isLoading=_=>document.querySelector('.upcoming-list>.refresh-wrapper img[alt="Loading"]')!=null //default is if there is no loading symbol on the page
+) { //executes callback after page is done loading
     let intervalID=setInterval(()=>{
-        let isLoading=document.querySelector('.upcoming-list>.refresh-wrapper img[alt="Loading"]')!=null;
-        if (isLoading) {
+        if (isLoading()) {
             // Continue waiting
             console.log('Loading...')
         } else {
@@ -64,7 +66,7 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
                         'div.upcoming-events-wrapper>div.upcoming-list', //upcoming assignments
                         'div.overdue-submissions-wrapper>div.upcoming-list', //overdue assignments
                     ]});
-                });
+                }, _=>!document.querySelector('div.overdue-submissions-wrapper>div.upcoming-list')); //check if upcoming list exists, not if loading icon does not exist
             } else { //Non-schoology-related page
                 //pass
             }
