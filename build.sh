@@ -15,7 +15,7 @@ if [[ $(ls -d ../build) == "../build" ]]; then #if exists, delete
     fi
     
     echo Removing previous build folder
-    rm -rf ../build
+    rm -rf ../build #deletes everything
 fi
 
 name="Homework Checker (Schoology)"
@@ -33,7 +33,7 @@ do
 done
 
 #* || Copying Folders
-for folder in */ #only folders in this directory
+for folder in */ #folders in this directory
 do
     if [[ "$folder" == "private/" || "$folder" == "branding/" ]] #ignored folders
     then
@@ -45,5 +45,10 @@ do
 done
 
 echo "✅ Build Complete"
+echo "Compressing..."
+tar -zcf "../build/$name.tar.gz" "../build/$name"
+echo "✅ Compressing complete"
 
 open "../build"
+
+echo 'display notification "Ready to upload zipped extension to web store" with title "Build.sh"' | osascript
