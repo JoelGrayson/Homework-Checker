@@ -9,14 +9,6 @@ class CalendarPage extends SchoologyPage {
                 time: 'any'
             }
         });
-        
-        //Disable window resizing because calendar re-renders when resizing, removing checkmarks
-        function injectScript(path) {
-            const script=document.createElement('script');
-            script.src=path;
-            document.body.appendChild(script);
-        }
-        injectScript(chrome.runtime.getURL('alter page/injected/remove window resize listener.js'));
 
         this.addCheckmarks({
             assignmentsContainer: document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
@@ -61,6 +53,14 @@ class CalendarPage extends SchoologyPage {
             let newPathname=`${oldPathname}${dateURL}`;
             window.location.pathname=newPathname;
         }
+
+        //Revives when checkmarks disappear due to assignments re-render (such as when window resized or added a personal assignment)
+        setInterval(()=>{
+            
+            if (!document.querySelector('.j_check_cal')) //checkmarks don't exist anymore
+                new CalendarPage(); //revive checkmarks
+                //alternative: window.location.reload()
+        }, 300);
     }
 
     checkAllAssignments() {
