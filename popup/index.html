@@ -6,7 +6,7 @@
     <!-- Using local styles so no external calls -->
     <link rel="stylesheet" href="./bootstrap.min.css">
     <link rel="stylesheet" href="./ucjg.css">
-    <link rel='stylesheet' href='style.css'>
+    <link rel='stylesheet' href='./style.css'>
     <meta charset='UTF-8' /> <!-- enables emojis -->
 </head>
 <body>
@@ -32,6 +32,14 @@
 
     <p>*These features only work in the calendar view.</p>
 
+    <form method="POST" action="http://localhost:1027/homework-checker/review"
+    style="display: flex; align-items: center;">
+        <label for="review" style="position: relative; bottom: 15px;">Leave a review:</label>
+        <div style="display: flex; flex-direction: column; align-items: center">
+            <textarea name="review" id="review" cols="25" rows="2"></textarea>
+            <button type="submit" style="margin: 0 auto" class="btn btn-success">Submit</button>
+        </div>
+    </form>
     <br>
     <button class='btn btn-info'><a style='color: white' target='_blank' href='https://forms.gle/AzoqSVwKaVtRzrAH8'>
         Report a bug

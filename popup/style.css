@@ -17,3 +17,12 @@ h1 {
 label {
     word-wrap: break-word;
 }
+
+
+.custom-switch .custom-control-label::before {
+    /* position: relative; */
+    top: 7px;
+}
+.custom-switch .custom-control-label::after { /* move switch down */
+    top: calc(.25rem + 2px + 3px);
+}
