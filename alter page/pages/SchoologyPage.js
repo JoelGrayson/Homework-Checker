@@ -1,8 +1,8 @@
 class SchoologyPage { //abstract class; template for each page
-    constructor({pageType, getAssignmentByNamePathEl, infoToBlockEl, checkPrev, ignoreOldAssignments, multipleAssignmentContainers=false}) {
-        console.log({pageType, getAssignmentByNamePathEl, infoToBlockEl, checkPrev, ignoreOldAssignments, multipleAssignmentContainers})
+    constructor({pageType, getAsgmtByNamePathEl, infoToBlockEl, checkPrev, ignoreOldAsgmts, multipleAsgmtContainers=false}) {
+        console.log({pageType, getAsgmtByNamePathEl, infoToBlockEl, checkPrev, ignoreOldAsgmts, multipleAsgmtContainers})
         
-        chrome.storage.sync.get('settings', ({settings})=>{
+        chrome.storage.sync.get('settings', ({settings})=>{ //settings change appearance
             if (settings.showCheckmarks==='onHover') {
                 console.log('Only show checkmark on hover');
                 
@@ -12,7 +12,7 @@ class SchoologyPage { //abstract class; template for each page
                     .j_check_cal {
                         visibility: hidden; /* all input checks hidden */
                     }
-                    .fc-event:hover .j_check_cal { /* input check shown onhover of assignment */
+                    .fc-event:hover .j_check_cal { /* input check shown onhover of asgmt */
                         visibility: visible;
                     }
                 `;
@@ -21,12 +21,12 @@ class SchoologyPage { //abstract class; template for each page
         });
 
         this.pageType=pageType; //indicates css class for checkbox
-        this.multipleAssignmentContainers=multipleAssignmentContainers;
+        this.multipleAsgmtContainers=multipleAsgmtContainers;
 
-        this.getAssignmentByNamePathEl=getAssignmentByNamePathEl; //from where to search :contains() of an assignment by name
+        this.getAsgmtByNamePathEl=getAsgmtByNamePathEl; //from where to search :contains() of an asgmt by name
         this.infoToBlockEl=infoToBlockEl;
         this.checkPrev=checkPrev;
-        this.ignoreOldAssignments=ignoreOldAssignments ?? true; //true by default. overridden by user input
+        this.ignoreOldAsgmts=ignoreOldAsgmts ?? true; //true by default. overridden by user input
 
         /*{
             courses, //'$all' | String of course name
@@ -40,11 +40,11 @@ class SchoologyPage { //abstract class; template for each page
                     case 'reload':
                         location.reload();
                         break;
-                    case 'check all assignments':
-                        this.checkAllAssignments();
+                    case 'check all asgmts':
+                        this.checkAllAsgmtEl();
                         break;
-                    case 'check all assignments before today':
-                        this.checkAllAssignmentsBeforeToday();
+                    case 'check all asgmts before today':
+                        this.checkAllAsgmtElBeforeToday();
                         break;
                     default:
                         console.error('Unknown run message:', msg.run)
@@ -52,40 +52,39 @@ class SchoologyPage { //abstract class; template for each page
             }
         });
         //Sets this.checkedTasksGlobal to chrome storage
-        this.checkedTasksGlobal;
-        chrome.storage.sync.get('checkedTasks', ({checkedTasks})=>{
+        chrome.storage.sync.get('courses', ({courses})=>{
             this.checkedTasksGlobal=checkedTasks;
             console.log('checkedTasks', checkedTasks);
-            //checks previous assignments
+            //checks previous asgmts
             console.log(this.checkPrev)
             let courses=this.checkPrev.courses;
             let time=this.checkPrev.time;
             if (courses==='$all' && time==='any') { //calendar or home page
                 for (let course in this.checkedTasksGlobal) {
-                    let assignments=this.checkedTasksGlobal[course];
-                    for (let assignmentEl of assignments) {
-                        let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
+                    let asgmts=this.checkedTasksGlobal[course];
+                    for (let asgmtEl of asgmts) {
+                        let [infoEl, blockEl]=this.getAsgmtByName(asgmtEl);
                         if (infoEl!=='No matches')
                             this.j_check({
-                                assignmentEl: blockEl,
+                                asgmtEl: blockEl,
                                 options: { //don't store when initially checking (because checks are from previous state)
                                     storeInChrome: false,
                                 }
                             });
                     }
                 }
-            } else if (courses==='$all' && time==='future') { //not being used, potential if not prev assignments
+            } else if (courses==='$all' && time==='future') { //not being used, potential if not prev asgmts
 
-            } else if (courses!=='$all' && time==='any') { //course page (all assignments of course)
+            } else if (courses!=='$all' && time==='any') { //course page (all asgmts of course)
                 console.log(`Only checking the course: ${courses}`)
-                if (this.checkPrev.courses in this.checkedTasksGlobal) { //if checked assignments of that course
-                    let assignments=this.checkedTasksGlobal[courses];
-                    console.log('Assignments', assignments);
-                    for (let assignmentEl of assignments) {
-                        let [infoEl, blockEl]=this.getAssignmentByName(assignmentEl);
+                if (this.checkPrev.courses in this.checkedTasksGlobal) { //if checked asgmts of that course
+                    let asgmts=this.checkedTasksGlobal[courses];
+                    console.log('Asgmts', asgmts);
+                    for (let asgmtEl of asgmts) {
+                        let [infoEl, blockEl]=this.getAsgmtByName(asgmtEl);
                         if (infoEl!=='No matches')
                             this.j_check({
-                                assignmentEl: blockEl,
+                                asgmtEl: blockEl,
                                 options: {
                                     storeInChrome: false,
                                 }
@@ -95,52 +94,52 @@ class SchoologyPage { //abstract class; template for each page
             }
         });
     }
-    addCheckmarks({ //called in subclass' constructor, adds checkmarks to each assignment for clicking; checks those checkmarks based on chrome storage
-        assignmentsContainer, //where the assignments are located
+    addCheckmarks({ //called in subclass' constructor, adds checkmarks to each asgmt for clicking; checks those checkmarks based on chrome storage
+        asgmtElContainer, //where the asgmts are located
         customMiddleScript, //anonymous func executed in the middle
         locateElToAppendCheckmarkTo //determines how to add children els ie el=>el.parentNode
     }) {
-        let children=assignmentsContainer.children;
-        for (let assignmentEl of children) {
+        let children=asgmtElContainer.children;
+        for (let asgmtEl of children) {
             let checkEl=document.createElement('input');
             checkEl.className=`j_check_${this.pageType}`;
             checkEl.type='checkbox';
             checkEl.addEventListener('change', ()=>{
                 //animate because user clicking
                 this.j_check({
-                    assignmentEl,
+                    asgmtEl,
                     options: {
                         storeInChrome: true,
                         animate: true //shows animation when checking
                     }
                 });
             });
-            let toRun=customMiddleScript(checkEl, assignmentEl); //returns string to evaluate (rarely used)
+            let toRun=customMiddleScript(checkEl, asgmtEl); //returns string to evaluate (rarely used)
             if (toRun==='continue')
                 continue;
             
-            locateElToAppendCheckmarkTo(assignmentEl).appendChild(checkEl);
+            locateElToAppendCheckmarkTo(asgmtEl).appendChild(checkEl);
         }
     }
 
-    getAssignmentByName(assignmentName) { //returns DOMElement based on given string
+    getAsgmtByName(asgmtName) { //returns DOMElement based on given string
         let query, queryRes;
 
-        console.log(assignmentName, this.multipleAssignmentContainers)
+        console.log(asgmtName, this.multipleAsgmtContainers)
         
-        if (this.multipleAssignmentContainers) { //multiple assignment containers to check
-            for (let getAssignmentByNamePathEl of this.getAssignmentByNamePathEl) { 
-                query=`${getAssignmentByNamePathEl}:contains('${   assignmentName.replaceAll(`'`, `\\'`) /* escape quote marks */  }')`;
+        if (this.multipleAsgmtContainers) { //multiple asgmt containers to check
+            for (let getAsgmtByNamePathEl of this.getAsgmtByNamePathEl) { 
+                query=`${getAsgmtByNamePathEl}:contains('${   asgmtName.replaceAll(`'`, `\\'`) /* escape quote marks */  }')`;
                 queryRes=jQuery(query);
-                if (queryRes.length>0) //keeps going thru assignmentContainers until queryRes is an assignment
+                if (queryRes.length>0) //keeps going thru asgmtContainers until queryRes is an asgmt
                     break;
                 else
                     continue;
             }
         } else {
-            query=`${this.getAssignmentByNamePathEl}:contains('${   assignmentName.replaceAll(`'`, `\\'`) /* escape quote marks */  }')`;
+            query=`${this.getAsgmtByNamePathEl}:contains('${   asgmtName.replaceAll(`'`, `\\'`) /* escape quote marks */  }')`;
             queryRes=jQuery(query); //has info (course & event), identifier
-            //jQuery's :contains() will match elements where assignmentName is a substring of the assignment. else if below handles overlaps
+            //jQuery's :contains() will match elements where asgmtName is a substring of the asgmt. else if below handles overlaps
         }
         
         
@@ -149,21 +148,21 @@ class SchoologyPage { //abstract class; template for each page
             infoEl=queryRes[0];
         else if (queryRes.length>=2) { //2+ conflicting matches 🤏 so so  (needs processing to find right element)
             for (let i=0; i<queryRes.length; i++) { //test for every element
-                if (queryRes[i].firstChild.nodeValue===assignmentName) { //if element's assignment title matches assignmentName, that is the right element
+                if (queryRes[i].firstChild.nodeValue===asgmtName) { //if element's asgmt title matches asgmtName, that is the right element
                     infoEl=queryRes[i];
                     break;
                 }
             }
         } else { //returns if no matches 👎
-            if (!this.ignoreOldAssignments) {
-                console.error(`No elements matched ${assignmentName}`, {
+            if (!this.ignoreOldAsgmts) {
+                console.error(`No elements matched ${asgmtName}`, {
                     errorInfo: {
-                        getAssignmentByNamePathEl: this.getAssignmentByNamePathEl,
+                        getAsgmtByNamePathEl: this.getAsgmtByNamePathEl,
                         query,
                         queryRes,
                         infoEl
                     }
-                }, 'This error may be caused by old assignments');
+                }, 'This error may be caused by old asgmts');
             }
             return ['No matches', 'No matches'];
         }
@@ -174,7 +173,7 @@ class SchoologyPage { //abstract class; template for each page
 
     j_check({ //polymorphism allows this function to be specialized among each SchoologyPage subclass. However, it is called from this SchoologyPage
         // Below are the conventional inputs
-        assignmentEl,
+        asgmtEl,
         forcedState=null, //if null, j_check toggles. if true/false, it forces into that state
         options: {
             storeInChrome=true,

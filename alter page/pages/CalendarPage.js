@@ -2,7 +2,7 @@ class CalendarPage extends SchoologyPage {
     constructor() {
         super({
             pageType: 'cal',
-            getAssignmentByNamePathEl: 'span.fc-event-title>span',
+            getAsgmtByNamePathEl: 'span.fc-event-title>span',
             infoToBlockEl: el=>el.parentNode.parentNode.parentNode,
             checkPrev: {
                 courses: '$all',
@@ -11,9 +11,9 @@ class CalendarPage extends SchoologyPage {
         });
 
         this.addCheckmarks({
-            assignmentsContainer: document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
-            customMiddleScript: (checkEl, assignmentEl)=>{
-                jQuery(checkEl).on('click', e=>{ //prevent assignment dialog from opening when clicking checkmark
+            asgmtElContainer: document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
+            customMiddleScript: (checkEl, asgmtEl)=>{
+                jQuery(checkEl).on('click', e=>{ //prevent asgmt dialog from opening when clicking checkmark
                     e.stopPropagation();
                 });
             },
@@ -54,7 +54,7 @@ class CalendarPage extends SchoologyPage {
             window.location.pathname=newPathname;
         }
 
-        //Revives when checkmarks disappear due to assignments re-render (such as when window resized or added a personal assignment)
+        //Revives when checkmarks disappear due to asgmts re-render (such as when window resized or added a personal asgmt)
         setInterval(()=>{
             
             if (!document.querySelector('.j_check_cal')) //checkmarks don't exist anymore
@@ -63,13 +63,13 @@ class CalendarPage extends SchoologyPage {
         }, 300);
     }
 
-    checkAllAssignments() {
+    checkAllAsgmtEl() {
         let elementsByDate=jQuery(`span[class*='day-']`);
         for (let el of elementsByDate) {
-            let assignmentEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-            if (assignmentEl!=null)
+            let asgmtEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+            if (asgmtEl!=null)
                 this.j_check({
-                    assignmentEl,
+                    asgmtEl,
                     forcedState: true,
                     options: {
                         storeInChrome: true
@@ -78,17 +78,17 @@ class CalendarPage extends SchoologyPage {
         }
     }
 
-    checkAllAssignmentsBeforeToday() {
+    checkAllAsgmtElBeforeToday() {
         let elementsByDate=jQuery(`span[class*='day-']`);
         let today=new Date().getDate();
         for (let el of elementsByDate) {
             let dayOfEl=parseInt(el.className.slice(-2))
             let beforeToday=dayOfEl<today;
             if (beforeToday) { //before today
-                let assignmentEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-                if (assignmentEl!=null)
+                let asgmtEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+                if (asgmtEl!=null)
                     this.j_check({ //forcedState is true
-                        assignmentEl,
+                        asgmtEl,
                         forcedState: true,
                         options: {
                             storeInChrome: true
@@ -98,45 +98,45 @@ class CalendarPage extends SchoologyPage {
         }
     }
     j_check({
-        assignmentEl,
+        asgmtEl,
         forcedState=null,
         options: {
             storeInChrome=true,
             animate=false //shows animation when checking
         }
     }) { //checks/unchecks passed in element
-        //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior assignments from storage. is true all other times
-        let pHighlight=assignmentEl.querySelector('.highlight-green'); //based on item inside assignment
-        const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
-        let assignmentText=assignmentEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of assignment (firstChild), not including inside grandchildren like innerText()
-        let courseText=assignmentEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
+        //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior asgmts from storage. is true all other times
+        let pHighlight=asgmtEl.querySelector('.highlight-green'); //based on item inside asgmt
+        const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
+        let asgmtText=asgmtEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of asgmt (firstChild), not including inside grandchildren like innerText()
+        let courseText=asgmtEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
         courseText=removeSpaces(courseText);
         let newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
 
         if (newState) { //no highlight green already
-            console.log(`Checking ${assignmentText}`);
+            console.log(`Checking ${asgmtText}`);
             //Check
             checkmarkEl.checked=true;        
             const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
-            assignmentEl.insertBefore(highlightGreenEl, assignmentEl.firstChild); //insert as first element (before firstElement)
+            asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstElement)
             
             if (storeInChrome) {
                 if (courseText in this.checkedTasksGlobal) { //already exists, so append
-                    this.checkedTasksGlobal[courseText].push(assignmentText);
+                    this.checkedTasksGlobal[courseText].push(asgmtText);
                 } else { //not exist, so create course log
                     this.checkedTasksGlobal[courseText]=[];
-                    this.checkedTasksGlobal[courseText].push(assignmentText); //push to newly created class
+                    this.checkedTasksGlobal[courseText].push(asgmtText); //push to newly created class
                 }
                 this.updateCheckedTasks(this.checkedTasksGlobal);
             }
         } else {
-            console.log(`Unchecking ${assignmentText}`);
+            console.log(`Unchecking ${asgmtText}`);
             //Uncheck
             checkmarkEl.checked=false;
-            assignmentEl.removeChild(pHighlight);
+            asgmtEl.removeChild(pHighlight);
             
-            // checkedTasksGlobal.pop(checkedTasksGlobal.indexOf(assignmentText));
-            this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(assignmentText));
+            // checkedTasksGlobal.pop(checkedTasksGlobal.indexOf(asgmtText));
+            this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(asgmtText));
             this.updateCheckedTasks(this.checkedTasksGlobal);
         }
     }

@@ -5,13 +5,13 @@ chrome.runtime.onInstalled.addListener(()=>{
             betaEnabled: false, //shows beta features
             overdueCollapsed: false, //when true, overdue section is collapsed
         },
-        checkedTasks: {} //object with keys of courseNames and values of list of strings of assignments already checked, all other assignments remain unchecked
-        /*
-        Example:
-            '$classWithNoSpaces': ['checked assignment 1', 'assignment 2'], //no spaces because removeSpaces()
-            'englishII': ['read macbeth', 'study for grammar quiz']
-        } */
+        courses: [] //array of courses with checked asgmts
     });
+    setInterval(()=>{ //see data
+        chrome.storage.sync.get('courses', (data)=>{
+            console.log(data.courses);
+        })
+    }, 3000);
 });
 
 chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and let know updated
@@ -21,3 +21,20 @@ chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and l
     });
     chrome.runtime.reload();
 });
+
+/*
+Schema:
+{
+    settings: {...},
+    courses: [
+        { //course
+            name: 'English II: ENG II - B1',
+            noSpacesName: 'EnglishII:ENGII-B1', //for different calendar & home course names
+            checked: ['read macbeth', 'study for grammar quiz'], //asgmts
+        }
+    ]
+}
+
+
+
+*/

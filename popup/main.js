@@ -43,9 +43,9 @@ overdueCollapsed.addEventListener('change', async ()=>{
 });
 
 //*|| Button EventListeners
-//Check all assignments
+//Check all asgmts
 document.getElementById('checkAll').addEventListener('click', ()=>{
-    sendMessage({run: 'check all assignments'});
+    sendMessage({run: 'check all asgmts'});
 });
 
 //Uncheck all (reset) Button
@@ -56,9 +56,9 @@ document.getElementById('resetBtn').addEventListener('click', async e=>{
     sendMessage({run: 'reload'}); //reload page for changes to show
 });
 
-//check all assignments before today
+//check all asgmts before today
 document.getElementById('checkAllBeforeToday').addEventListener('click', ()=>{
-    sendMessage({run: 'check all assignments before today'});
+    sendMessage({run: 'check all asgmts before today'});
 });
 
 

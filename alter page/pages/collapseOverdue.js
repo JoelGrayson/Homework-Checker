@@ -43,8 +43,8 @@ function collapseOverdue() { //sets up
         rerenderCollapseBtn(initialVal); //initial call
     
         function rerenderCollapseBtn(newVal) {
-            const assignmentsEl=document.querySelector(overdueWrapperPath+'>div.upcoming-list');
-            assignmentsEl.classList.toggle('j_collapsed', newVal); //class if newVal
+            const asgmtsEl=document.querySelector(overdueWrapperPath+'>div.upcoming-list');
+            asgmtsEl.classList.toggle('j_collapsed', newVal); //class if newVal
             collapseBtn.innerText=newVal?'Show Overdue Assignments':'Hide Overdue Assignments';
         }
     }

@@ -6,7 +6,7 @@ class CoursePage extends SchoologyPage { //materials page (one course)
 
         super({
             pageType: 'course',
-            getAssignmentByNamePathEl: `${containerPath}>div[data-start]`, //searches inside assignment
+            getAsgmtByNamePathEl: `${containerPath}>div[data-start]`, //searches inside asgmt
             infoToBlockEl: el=>el,
             checkPrev: {
                 courses: courseName,
@@ -17,63 +17,63 @@ class CoursePage extends SchoologyPage { //materials page (one course)
         this.courseName=courseName;
 
         this.addCheckmarks({
-            assignmentsContainer: document.querySelector(containerPath), //all assignments' container
-            customMiddleScript: (checkEl, assignmentEl)=>{
-                if (assignmentEl.classList.contains('date-header')) //does not add check to .date-header by continue;ing out of loop
+            asgmtElContainer: document.querySelector(containerPath), //all asgmts' container
+            customMiddleScript: (checkEl, asgmtEl)=>{
+                if (asgmtEl.classList.contains('date-header')) //does not add check to .date-header by continue;ing out of loop
                     return 'continue';
             },
             locateElToAppendCheckmarkTo: el=>el.firstChild
         });
     }
     j_check({
-        assignmentEl,
+        asgmtEl,
         forcedState=null,
         options: {
             storeInChrome=true,
             animate=false //shows animation when checking
         }
     }) { //forceState forces the check to be true/false
-        const pHighlight=!!assignmentEl.querySelector('.highlight-green'); //based on classList of assignmentEl
+        const pHighlight=!!asgmtEl.querySelector('.highlight-green'); //based on classList of asgmtEl
         const newState=forcedState ?? !pHighlight; //opposite when checking
 
-        const checkmarkEl=assignmentEl.querySelector(`input.j_check_${this.pageType}`);
-        const assignmentText=assignmentEl.querySelector('a').innerText;
+        const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
+        const asgmtText=asgmtEl.querySelector('a').innerText;
         
         console.log({newHighlight: newState, pHighlight, checkmarkEl});
 
         if (newState) { //no highlight green already, so check
-            console.log(`Checking ${assignmentText}`);
+            console.log(`Checking ${asgmtText}`);
             //Check
             checkmarkEl.checked=true;
             const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
-            assignmentEl.style.position='relative'; //for green rect to be bound to assignmentEl
-            assignmentEl.querySelector('h4').style.position='relative'; //so that text above checkmark
-            assignmentEl.insertBefore(highlightGreenEl, assignmentEl.firstChild); //insert as first element (before firstChild)
+            asgmtEl.style.position='relative'; //for green rect to be bound to asgmtEl
+            asgmtEl.querySelector('h4').style.position='relative'; //so that text above checkmark
+            asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstChild)
  
             if (storeInChrome) {
                 if (this.courseName in this.checkedTasksGlobal) { //already exists, so append
-                    this.checkedTasksGlobal[this.courseName].push(assignmentText);
+                    this.checkedTasksGlobal[this.courseName].push(asgmtText);
                 } else { //not exist, so create course log
                     this.checkedTasksGlobal[this.courseName]=[];
-                    this.checkedTasksGlobal[this.courseName].push(assignmentText); //push to newly created class
+                    this.checkedTasksGlobal[this.courseName].push(asgmtText); //push to newly created class
                 }
                 this.updateCheckedTasks(this.checkedTasksGlobal);
             }
         } else { //uncheck
-            console.log(`Unchecking ${assignmentText}`);
+            console.log(`Unchecking ${asgmtText}`);
             checkmarkEl.checked=false;
-            const toRemove=assignmentEl.querySelector('.highlight-green');
+            const toRemove=asgmtEl.querySelector('.highlight-green');
             toRemove.parentNode.removeChild(toRemove);            
 
             try {
                 this.checkedTasksGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
-                    this.checkedTasksGlobal[this.courseName].indexOf(assignmentText)
+                    this.checkedTasksGlobal[this.courseName].indexOf(asgmtText)
                 );
                 this.updateCheckedTasks(this.checkedTasksGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
-                    this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(assignmentText));
+                    this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(asgmtText));
                     this.updateCheckedTasks(this.checkedTasksGlobal);
                 }, 1000);
             }

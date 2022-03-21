@@ -1,7 +1,7 @@
 //This script is injected into every page.
 //Functions are in sequential order
 
-let homeworkCheckerSchoologyConfig={
+const homeworkCheckerSchoologyConfig={
     verbose: true //whether or not to show console messages
 }
 
@@ -31,7 +31,7 @@ function executeAfterDoneLoading(
         } else {
             clearInterval(intervalID); //stop interval
             
-            setTimeout(()=>{ //wait another .01 seconds for assignmentEls to render on DOM
+            setTimeout(()=>{ //wait another .01 seconds for asgmtEls to render on DOM
                 callback();
             }, 10)
         }
@@ -60,11 +60,10 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
                     new CoursePage(courseID);
                 })
             } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
-                let assignmentsAreLoading=true;
                 executeAfterDoneLoading(()=>{
                     new HomePage({containerSelectors: [
-                        'div.upcoming-events-wrapper>div.upcoming-list', //upcoming assignments
-                        'div.overdue-submissions-wrapper>div.upcoming-list', //overdue assignments
+                        'div.upcoming-events-wrapper>div.upcoming-list', //upcoming asgmts
+                        'div.overdue-submissions-wrapper>div.upcoming-list', //overdue asgmts
                     ]});
                 }, _=>!document.querySelector('div.overdue-submissions-wrapper>div.upcoming-list')); //check if upcoming list exists, not if loading icon does not exist
             } else { //Non-schoology-related page
@@ -80,11 +79,10 @@ function removeSpaces(input) { //for some reason, calendar page and home page ha
     // "Algebra II (H) : ALGEBRA II H - G "
 
     let str='';
-    for (let character of input) {
-        if (character!==' ') {
+    for (let character of input)
+        if (character!==' ')
             str+=character;
-        }
-    }
+    
     return str;
 }
 
@@ -92,7 +90,7 @@ function removeSpaces(input) { //for some reason, calendar page and home page ha
 //Resize event listener
 function waitForEventsLoaded() { //waits for calendar's events to load before calling next
     let checkIfEventsLoaded=setInterval(()=>{
-        let calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=3; //more than three assignments on calendar indicating assignments loaded
+        let calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=3; //more than three asgmts on calendar indicating asgmts loaded
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
             console.log('3. Add checkmarks');
