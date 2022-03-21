@@ -188,52 +188,47 @@ class SchoologyPage { //abstract class; template for each page
         const highlightGreen=document.createElement('div');
         highlightGreen.classList.add('highlight-green');
         highlightGreen.classList.add(`highlight-green-${pageType}`);
-        if (animate) {
-            highlightGreen.innerHTML=`
-                <svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'
-                    style='width: 100%; height: 100%; transform: scaleX(-1)'>
-                    <!-- Dark Green Background -->
-                    <path fill='rgb(115, 252, 127)' d='M 10 0 L 10 10 L 0 10 L 0 0 Z' />
-                    <!-- Slash Between Center -->
-                    <path stroke='green' d='M 0 0 L 10 10 Z'>
-                        <animate
-                            attributeName='d'
-                            dur='0.2s'
-                            repeatCount='1'
-                            values='
-                                M 0 0 L;
-                                M 0 0 L;
-                                M 0 0 L;
-                                M 0 0 L;
-                                M 0 0 L;
-                                M 0 0 L;
-                                M 0 0 L;
-                                M 0 0 L 0.7 0.7 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L 7.29 7.29 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L 7.29 7.29 L 8.39 8.39 L;
-                                M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L 7.29 7.29 L 8.39 8.39 L 10 10 L'
-                        />
-                        <!-- Animation notes: at start, no movement. gradually gets faster and faster -->
-                    </path>
-                </svg>
-            `;
-        } else {
-            highlightGreen.innerHTML=`
-                <svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'
-                    style='width: 100%; height: 100%; transform: scaleX(-1)'>
-                    <!-- Dark Green Background -->
-                    <path fill='rgb(115, 252, 127)' d='M 10 0 L 10 10 L 0 10 L 0 0 Z' />
-                    <!-- Slash Between Center -->
-                    <path stroke='green' d='M 0 0 L 10 10 Z'/>
-                </svg>
-            `;
-        }
+        highlightGreen.innerHTML=/* highlight animaged svg */`
+            <svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 10 10'
+                style='width: 100%; height: 100%; transform: scaleX(-1)'>
+                <!-- Dark Green Background -->
+                <path fill='rgb(115, 252, 127)' d='M 10 0 L 10 10 L 0 10 L 0 0 Z' />
+                <!-- Slash Between Center -->
+                <path stroke='green' d='M 0 0 L 10 10 Z'>
+                ${ //if animate, add an animation tag inside <path>
+                    animate
+                    ?
+                    `<!-- Animation notes: at start, no movement. gradually gets faster and faster -->
+                    <animate
+                        attributeName='d'
+                        dur='0.2s'
+                        repeatCount='1'
+                        values='
+                            M 0 0 L;
+                            M 0 0 L;
+                            M 0 0 L;
+                            M 0 0 L;
+                            M 0 0 L;
+                            M 0 0 L;
+                            M 0 0 L;
+                            M 0 0 L 0.7 0.7 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L 7.29 7.29 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L 7.29 7.29 L 8.39 8.39 L;
+                            M 0 0 L 0.8 0.8 L 1.6 1.6 L 2.5 2.5 L 3.4 3.4 L 4.35 4.35 L 5.31 5.31 L 6.29 6.29 L 7.29 7.29 L 8.39 8.39 L 10 10 L'
+                    />`:''
+                }
+                </path>
+                <path stroke='green' d='M 0 0 L 10 10 Z'>
+                    
+                </path>
+            </svg>
+        `;
         return highlightGreen;
     }
 
