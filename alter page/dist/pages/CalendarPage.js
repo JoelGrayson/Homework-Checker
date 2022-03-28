@@ -4,7 +4,7 @@ class CalendarPage extends SchoologyPage {
             pageType: 'cal',
             getAsgmtByNamePathEl: 'span.fc-event-title>span',
             infoToBlockEl: el=>el.parentNode.parentNode.parentNode,
-            checkPrev: {
+            limits: {
                 courses: '$all',
                 time: 'any'
             }
@@ -117,7 +117,7 @@ class CalendarPage extends SchoologyPage {
             console.log(`Checking ${asgmtText}`);
             //Check
             checkmarkEl.checked=true;        
-            const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
+            const highlightGreenEl=this.createGreenHighlightEl({pageType: this.pageType, animate});
             asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstElement)
             
             if (storeInChrome) {

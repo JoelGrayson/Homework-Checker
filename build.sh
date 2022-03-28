@@ -2,6 +2,8 @@
 
 # ABOUT: Builds for uploading to web store. Ignores certain files
 
+# TODO: Grunt script
+
 #* || Empty Build Folder (clear or create)
 if [[ $(ls -d ../build) == "../build" ]]; then #if exists, delete
     # There is a build folder

@@ -1,6 +1,6 @@
 class SchoologyPage { //abstract class; template for each page
-    constructor({pageType, getAsgmtByNamePathEl, infoToBlockEl, checkPrev, ignoreOldAsgmts, multipleAsgmtContainers=false}) {
-        console.log({pageType, getAsgmtByNamePathEl, infoToBlockEl, checkPrev, ignoreOldAsgmts, multipleAsgmtContainers})
+    constructor({pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts, multipleAsgmtContainers=false}) {
+        console.log({pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts, multipleAsgmtContainers})
         
         chrome.storage.sync.get('settings', ({settings})=>{ //settings change appearance
             if (settings.showCheckmarks==='onHover') {
@@ -25,7 +25,6 @@ class SchoologyPage { //abstract class; template for each page
 
         this.getAsgmtByNamePathEl=getAsgmtByNamePathEl; //from where to search :contains() of an asgmt by name
         this.infoToBlockEl=infoToBlockEl;
-        this.checkPrev=checkPrev;
         this.ignoreOldAsgmts=ignoreOldAsgmts ?? true; //true by default. overridden by user input
 
         /*{
@@ -55,11 +54,8 @@ class SchoologyPage { //abstract class; template for each page
         chrome.storage.sync.get('courses', ({courses})=>{
             this.checkedTasksGlobal=checkedTasks;
             console.log('checkedTasks', checkedTasks);
-            //checks previous asgmts
-            console.log(this.checkPrev)
-            let courses=this.checkPrev.courses;
-            let time=this.checkPrev.time;
-            if (courses==='$all' && time==='any') { //calendar or home page
+            console.log(limits); //time & course limits when getting asgmts
+            if (limits.courses==='$all' && limits.time==='any') { //calendar or home page
                 for (let course in this.checkedTasksGlobal) {
                     let asgmts=this.checkedTasksGlobal[course];
                     for (let asgmtEl of asgmts) {
@@ -73,12 +69,12 @@ class SchoologyPage { //abstract class; template for each page
                             });
                     }
                 }
-            } else if (courses==='$all' && time==='future') { //not being used, potential if not prev asgmts
+            } else if (limits.courses==='$all' && this.time==='future') { //not being used, potential if not prev asgmts
 
-            } else if (courses!=='$all' && time==='any') { //course page (all asgmts of course)
-                console.log(`Only checking the course: ${courses}`)
-                if (this.checkPrev.courses in this.checkedTasksGlobal) { //if checked asgmts of that course
-                    let asgmts=this.checkedTasksGlobal[courses];
+            } else if (limits.courses!=='$all' && this.time==='any') { //course page (all asgmts of course)
+                console.log(`Only checking the course: ${this.courses}`)
+                if (courses in this.checkedTasksGlobal) { //if checked asgmts of that course
+                    let asgmts=this.checkedTasksGlobal[this.courses];
                     console.log('Asgmts', asgmts);
                     for (let asgmtEl of asgmts) {
                         let [infoEl, blockEl]=this.getAsgmtByName(asgmtEl);
@@ -88,7 +84,7 @@ class SchoologyPage { //abstract class; template for each page
                                 options: {
                                     storeInChrome: false,
                                 }
-                            })
+                            });
                     }
                 }
             }
@@ -181,7 +177,7 @@ class SchoologyPage { //abstract class; template for each page
         }
     }) {}
 
-    createHighlightGreenEl({ //creates highlightGreenEl with animate/no animate
+    createGreenHighlightEl({ //creates highlightGreenEl with animate/no animate
         pageType,
         animate //: Boolean
     }) {

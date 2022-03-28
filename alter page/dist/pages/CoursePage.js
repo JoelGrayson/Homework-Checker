@@ -8,7 +8,7 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             pageType: 'course',
             getAsgmtByNamePathEl: `${containerPath}>div[data-start]`, //searches inside asgmt
             infoToBlockEl: el=>el,
-            checkPrev: {
+            limits: {
                 courses: courseName,
                 time: 'any'
             }
@@ -45,7 +45,7 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             console.log(`Checking ${asgmtText}`);
             //Check
             checkmarkEl.checked=true;
-            const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
+            const highlightGreenEl=this.createGreenHighlightEl({pageType: this.pageType, animate});
             asgmtEl.style.position='relative'; //for green rect to be bound to asgmtEl
             asgmtEl.querySelector('h4').style.position='relative'; //so that text above checkmark
             asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstChild)

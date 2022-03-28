@@ -5,24 +5,24 @@
     "manifest_version": 3,
     "author": "Joel Grayson",
     "background": {
-        "service_worker": "alter page/background.js"
+        "service_worker": "alter page/dist/background.js"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
             "js": [
-                "alter page/injected/jquery.min.js",
+                "alter page/dist/injected/jquery.min.js",
 
-                "alter page/pages/SchoologyPage.js",
-                "alter page/pages/CalendarPage.js",
-                "alter page/pages/CoursePage.js",
-                "alter page/pages/collapseOverdue.js",
-                "alter page/pages/HomePage.js",
-                "alter page/main.js"
+                "alter page/dist/pages/SchoologyPage.js",
+                "alter page/dist/pages/CalendarPage.js",
+                "alter page/dist/pages/CoursePage.js",
+                "alter page/dist/pages/collapseOverdue.js",
+                "alter page/dist/pages/HomePage.js",
+                "alter page/dist/main.js"
             ],
             "css": [
-                "alter page/injected/checkmark.css",
-                "alter page/injected/style.css"
+                "alter page/dist/injected/checkmark.css",
+                "alter page/dist/injected/style.css"
             ],
             "run_at": "document_end"
         }

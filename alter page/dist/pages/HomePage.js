@@ -4,7 +4,7 @@ class HomePage extends SchoologyPage {
             pageType: 'home',
             getAsgmtByNamePathEl: containerSelectors.map(s=>`${s}>div`), //gets div (asgmt) inside containerSelector
             infoToBlockEl: el=>el,
-            checkPrev: {
+            limits: {
                 courses: '$all',
                 time: 'any'
             },
@@ -54,7 +54,7 @@ class HomePage extends SchoologyPage {
             console.log(`Checking '${asgmtText}'`);
 
             checkmarkEl.checked=true;
-            const highlightGreenEl=this.createHighlightGreenEl({pageType: this.pageType, animate});
+            const highlightGreenEl=this.createGreenHighlightEl({pageType: this.pageType, animate});
             const parent=asgmtEl.querySelector('h4');
             asgmtEl.querySelector('h4>span').style.position='relative'; //so that text above checkmark
             parent.insertBefore(highlightGreenEl, parent.firstChild); //insert as first element (before firstElement)

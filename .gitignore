@@ -1,3 +1,4 @@
 *.DS_Store
 private/*
 **/*.css.map
+**/node_modules
