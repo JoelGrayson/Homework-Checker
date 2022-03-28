@@ -1,0 +1,78 @@
+.highlight-green {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.highlight-green-cal {
+  z-index: 10;
+  opacity: 0.6;
+}
+
+.highlight-green-home {
+  top: 0;
+  left: 0;
+}
+
+.highlight-green-course {
+  top: 0;
+  left: 0;
+}
+
+input[class^=j_check_]::before {
+  content: "";
+  display: block;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background-color: white;
+  border: 1px solid #555;
+  border-radius: 3px;
+  cursor: pointer;
+}
+input[class^=j_check_]::after {
+  content: "";
+  width: calc(6px + 15px + 6px);
+  height: calc(6px + 15px + 6px);
+  position: absolute;
+  top: calc(-1 * 6px);
+  left: calc(-1 * 6px);
+}
+input[class^=j_check_]:hover::before {
+  background-color: #dbe6de;
+}
+input[class^=j_check_]:active::before {
+  background-color: #a6ccac;
+}
+input[class^=j_check_]:checked::before {
+  background-color: #05d74b;
+  border: 1px solid #077a2d;
+  border-radius: 3px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'><path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='13' stroke-linecap='round' stroke-linejoin='round' /></svg>");
+}
+input[class^=j_check_]:checked:hover::before {
+  background-color: #01a036;
+}
+input[class^=j_check_]:checked:active::before {
+  background-color: #018f30;
+}
+
+.j_check_cal {
+  position: absolute;
+  zoom: 0.8;
+  right: 8px;
+  bottom: 8px;
+  z-index: 11;
+  border: 1.3px solid #333;
+}
+
+.j_check_course {
+  zoom: 0.93;
+}
+
+.j_check_home {
+  zoom: 0.93;
+  position: relative;
+}

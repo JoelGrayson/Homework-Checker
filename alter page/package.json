@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/JoelGrayson/Homework-Checker#readme",
   "dependencies": {
+    "del": "^6.0.0",
     "gulp": "^4.0.2",
-    "gulp-typescript": "^6.0.0-alpha.1"
+    "gulp-sass": "^5.1.0",
+    "gulp-typescript": "^6.0.0-alpha.1",
+    "sass": "^1.49.9"
   }
 }
