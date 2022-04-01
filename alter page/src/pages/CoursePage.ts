@@ -1,7 +1,13 @@
-class CoursePage extends SchoologyPage { //materials page (one course)
-    constructor(courseID) {
+import SchoologyPage from './SchoologyPage.js';
+import { removeSpaces } from '../functions.js';
+
+export default class CoursePage extends SchoologyPage { //materials page (one course)
+    courseId: string;
+    courseName: string;
+    
+    constructor(courseId) {
         let containerPath=`#course-events .upcoming-list .upcoming-events .upcoming-list`;
-        let courseName=document.querySelector('#center-top>.page-title').innerText; //grabs course title
+        let courseName=(document.querySelector('#center-top>.page-title') as HTMLElement).innerText; //grabs course title
         courseName=removeSpaces(courseName);
 
         super({
@@ -13,7 +19,7 @@ class CoursePage extends SchoologyPage { //materials page (one course)
                 time: 'any'
             }
         });
-        this.courseID=courseID;
+        this.courseId=courseId;
         this.courseName=courseName;
 
         this.addCheckmarks({
@@ -51,13 +57,13 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstChild)
  
             if (storeInChrome) {
-                if (this.courseName in this.checkedTasksGlobal) { //already exists, so append
-                    this.checkedTasksGlobal[this.courseName].push(asgmtText);
+                if (this.courseName in this.coursesGlobal) { //already exists, so append
+                    this.coursesGlobal[this.courseName].push(asgmtText);
                 } else { //not exist, so create course log
-                    this.checkedTasksGlobal[this.courseName]=[];
-                    this.checkedTasksGlobal[this.courseName].push(asgmtText); //push to newly created class
+                    this.coursesGlobal[this.courseName]=[];
+                    this.coursesGlobal[this.courseName].push(asgmtText); //push to newly created class
                 }
-                this.updateCheckedTasks(this.checkedTasksGlobal);
+                this.updateCheckedTasks(this.coursesGlobal);
             }
         } else { //uncheck
             console.log(`Unchecking ${asgmtText}`);
@@ -66,15 +72,15 @@ class CoursePage extends SchoologyPage { //materials page (one course)
             toRemove.parentNode.removeChild(toRemove);            
 
             try {
-                this.checkedTasksGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
-                    this.checkedTasksGlobal[this.courseName].indexOf(asgmtText)
+                this.coursesGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
+                    this.coursesGlobal[this.courseName].indexOf(asgmtText)
                 );
-                this.updateCheckedTasks(this.checkedTasksGlobal); //update
+                this.updateCheckedTasks(this.coursesGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
-                    this.checkedTasksGlobal[this.courseName].pop(this.checkedTasksGlobal[this.courseName].indexOf(asgmtText));
-                    this.updateCheckedTasks(this.checkedTasksGlobal);
+                    this.coursesGlobal[this.courseName].pop(this.coursesGlobal[this.courseName].indexOf(asgmtText));
+                    this.updateCheckedTasks(this.coursesGlobal);
                 }, 1000);
             }
         }

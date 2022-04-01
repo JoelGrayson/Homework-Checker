@@ -55,9 +55,9 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
         else {
             let hasCourse=window.location.pathname.match(/\/course\/(\d+)\//);
             if (hasCourse) { //type 2: course materials page
-                let courseID=hasCourse[1];
+                let courseId=hasCourse[1];
                 executeAfterDoneLoading(()=>{
-                    new CoursePage(courseID);
+                    new CoursePage(courseId);
                 })
             } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
                 executeAfterDoneLoading(()=>{

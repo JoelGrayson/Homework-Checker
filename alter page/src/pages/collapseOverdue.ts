@@ -1,4 +1,4 @@
-function collapseOverdue() { //sets up
+export default function collapseOverdue() { //sets up
     const overdueWrapperPath=`div.overdue-submissions-wrapper`;
 
     let intervalId=setInterval(()=>{
@@ -18,7 +18,7 @@ function collapseOverdue() { //sets up
             })
         }
         async function set(newVal) {
-            let oldSettings=await get();
+            let oldSettings: any=await get();
             let newSettings={...oldSettings};
             newSettings.overdueCollapsed=newVal;
             chrome.storage.sync.set({

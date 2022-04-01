@@ -1,4 +1,9 @@
-class HomePage extends SchoologyPage {
+import SchoologyPage from './SchoologyPage.js';
+import collapseOverdue from './collapseOverdue.js';
+import { removeSpaces } from '../functions.js';
+
+
+export default class HomePage extends SchoologyPage {
     constructor({containerSelectors}) { //array of selectors (overdue and upcoming)
         super({
             pageType: 'home',
@@ -45,9 +50,8 @@ class HomePage extends SchoologyPage {
         const newState=forcedState ?? !pHighlight; //opposite when checking
 
         const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
-        const asgmtText=asgmtEl.querySelector('a').innerText;
-        let courseText=asgmtEl.querySelector('h4>span').ariaLabel; //name of course based on aria-label of asgmtEl's <h4>'s <span>'s <div>
-        courseText=removeSpaces(courseText);
+        const asgmtText: string=asgmtEl.querySelector('a').innerText;
+        const courseText=removeSpaces(asgmtEl.querySelector('h4>span').ariaLabel); //name of course based on aria-label of asgmtEl's <h4>'s <span>'s <div>
         // console.log({courseText, asgmtEl});
 
         if (newState) { //check
@@ -55,18 +59,18 @@ class HomePage extends SchoologyPage {
 
             checkmarkEl.checked=true;
             const highlightGreenEl=this.createGreenHighlightEl({pageType: this.pageType, animate});
-            const parent=asgmtEl.querySelector('h4');
+            const parent=asgmtEl.querySelector('h4') as HTMLHeadingElement;
             asgmtEl.querySelector('h4>span').style.position='relative'; //so that text above checkmark
             parent.insertBefore(highlightGreenEl, parent.firstChild); //insert as first element (before firstElement)
            
             if (storeInChrome) {
-                if (courseText in this.checkedTasksGlobal) { //already exists, so append
-                    this.checkedTasksGlobal[courseText].push(asgmtText);
+                if (courseText in this.coursesGlobal) { //already exists, so append
+                    this.coursesGlobal[courseText].checked.push(asgmtText);
                 } else { //not exist, so create course log
-                    this.checkedTasksGlobal[courseText]=[];
-                    this.checkedTasksGlobal[courseText].push(asgmtText); //push to newly created class
+                    this.coursesGlobal[courseText].checked=[];
+                    this.coursesGlobal[courseText].checked.push(asgmtText); //push to newly created class
                 }
-                this.updateCheckedTasks(this.checkedTasksGlobal);
+                this.updateCheckedTasks(this.coursesGlobal);
             }
         } else { //uncheck
             console.log(`Unchecking '${asgmtText}'`);
@@ -75,15 +79,15 @@ class HomePage extends SchoologyPage {
             toRemove.parentNode.removeChild(toRemove);
             
             try {
-                this.checkedTasksGlobal[courseText].pop( //remove checkedTaskGlobal from list
-                    this.checkedTasksGlobal[courseText].indexOf(asgmtText)
+                this.coursesGlobal[courseText].checked.pop( //remove checkedTaskGlobal from list
+                    this.coursesGlobal[courseText].checked.indexOf(asgmtText)
                 );
-                this.updateCheckedTasks(this.checkedTasksGlobal); //update
+                this.updateCheckedTasks(this.coursesGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
-                    this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(asgmtText));
-                    this.updateCheckedTasks(this.checkedTasksGlobal);
+                    this.coursesGlobal[courseText].checked.pop(this.coursesGlobal[courseText].checked.indexOf(asgmtText));
+                    this.updateCheckedTasks(this.coursesGlobal);
                 }, 1000);
             }
         }

@@ -60,13 +60,13 @@ class HomePage extends SchoologyPage {
             parent.insertBefore(highlightGreenEl, parent.firstChild); //insert as first element (before firstElement)
            
             if (storeInChrome) {
-                if (courseText in this.checkedTasksGlobal) { //already exists, so append
-                    this.checkedTasksGlobal[courseText].push(asgmtText);
+                if (courseText in this.coursesGlobal) { //already exists, so append
+                    this.coursesGlobal[courseText].push(asgmtText);
                 } else { //not exist, so create course log
-                    this.checkedTasksGlobal[courseText]=[];
-                    this.checkedTasksGlobal[courseText].push(asgmtText); //push to newly created class
+                    this.coursesGlobal[courseText]=[];
+                    this.coursesGlobal[courseText].push(asgmtText); //push to newly created class
                 }
-                this.updateCheckedTasks(this.checkedTasksGlobal);
+                this.updateCheckedTasks(this.coursesGlobal);
             }
         } else { //uncheck
             console.log(`Unchecking '${asgmtText}'`);
@@ -75,15 +75,15 @@ class HomePage extends SchoologyPage {
             toRemove.parentNode.removeChild(toRemove);
             
             try {
-                this.checkedTasksGlobal[courseText].pop( //remove checkedTaskGlobal from list
-                    this.checkedTasksGlobal[courseText].indexOf(asgmtText)
+                this.coursesGlobal[courseText].pop( //remove checkedTaskGlobal from list
+                    this.coursesGlobal[courseText].indexOf(asgmtText)
                 );
-                this.updateCheckedTasks(this.checkedTasksGlobal); //update
+                this.updateCheckedTasks(this.coursesGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
-                    this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(asgmtText));
-                    this.updateCheckedTasks(this.checkedTasksGlobal);
+                    this.coursesGlobal[courseText].pop(this.coursesGlobal[courseText].indexOf(asgmtText));
+                    this.updateCheckedTasks(this.coursesGlobal);
                 }, 1000);
             }
         }

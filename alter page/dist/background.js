@@ -1,27 +1,26 @@
-chrome.runtime.onInstalled.addListener(()=>{
+/// <reference types="chrome"/>
+chrome.runtime.onInstalled.addListener(function () {
     chrome.storage.sync.set({
         settings: {
-            showCheckmarks: 'always', //'onHover' | 'always'
-            betaEnabled: false, //shows beta features
-            overdueCollapsed: false, //when true, overdue section is collapsed
+            showCheckmarks: 'always',
+            betaEnabled: false,
+            overdueCollapsed: false
         },
         courses: [] //array of courses with checked asgmts
     });
-    setInterval(()=>{ //see data
-        chrome.storage.sync.get('courses', (data)=>{
+    setInterval(function () {
+        chrome.storage.sync.get('courses', function (data) {
             console.log(data.courses);
-        })
+        });
     }, 3000);
 });
-
-chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and let know updated
-    console.log({details});
-    chrome.tabs.create({ //create new tab
+chrome.runtime.onUpdateAvailable.addListener(function (details) {
+    console.log({ details: details });
+    chrome.tabs.create({
         url: 'onboarding/updated.html'
     });
     chrome.runtime.reload();
 });
-
 /*
 Schema:
 {
@@ -34,7 +33,4 @@ Schema:
         }
     ]
 }
-
-
-
-*/
+*/ 

@@ -1,5 +1,36 @@
-class SchoologyPage { //abstract class; template for each page
-    constructor({pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts, multipleAsgmtContainers=false}) {
+/// <reference types="jquery"/>
+/// <reference types="chrome"/>
+
+interface Course {
+    name: string,
+    noSpacesName: string,
+    checked: string[], //checked assignments
+}
+
+
+interface PageOptions {
+    pageType: string,
+    getAsgmtByNamePathEl: string | string[],
+    infoToBlockEl: Function,
+    limits: {
+        courses: string, //'$all' or course name
+        time: 'any' | 'future'
+    },
+    ignoreOldAsgmts?: boolean,
+    multipleAsgmtContainers?: boolean
+}
+
+export default abstract class SchoologyPage {
+    pageType: string; //public by default
+    multipleAsgmtContainers: boolean;
+    getAsgmtByNamePathEl: string | string[];
+    infoToBlockEl: Function;
+    ignoreOldAsgmts: boolean;
+    private time: string;
+    courses: string; //abstract class; template for each page
+    coursesGlobal: Course[];
+
+    constructor({ pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts=true, multipleAsgmtContainers=false }: PageOptions) {
         console.log({pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts, multipleAsgmtContainers})
         
         chrome.storage.sync.get('settings', ({settings})=>{ //settings change appearance
@@ -25,7 +56,7 @@ class SchoologyPage { //abstract class; template for each page
 
         this.getAsgmtByNamePathEl=getAsgmtByNamePathEl; //from where to search :contains() of an asgmt by name
         this.infoToBlockEl=infoToBlockEl;
-        this.ignoreOldAsgmts=ignoreOldAsgmts ?? true; //true by default. overridden by user input
+        this.ignoreOldAsgmts=ignoreOldAsgmts;
 
         /*{
             courses, //'$all' | String of course name
@@ -50,15 +81,15 @@ class SchoologyPage { //abstract class; template for each page
                 }
             }
         });
-        //Sets this.checkedTasksGlobal to chrome storage
+        //Sets this.coursesGlobal to chrome storage
         chrome.storage.sync.get('courses', ({courses})=>{
-            this.checkedTasksGlobal=checkedTasks;
-            console.log('checkedTasks', checkedTasks);
+            this.coursesGlobal=courses;
+            console.log('courses', courses);
             console.log(limits); //time & course limits when getting asgmts
             if (limits.courses==='$all' && limits.time==='any') { //calendar or home page
-                for (let course in this.checkedTasksGlobal) {
-                    let asgmts=this.checkedTasksGlobal[course];
-                    for (let asgmtEl of asgmts) {
+                for (let course of courses) { //TODO: change schema
+                    let checked=course.checked; //asgmts
+                    for (let asgmtEl of checked) {
                         let [infoEl, blockEl]=this.getAsgmtByName(asgmtEl);
                         if (infoEl!=='No matches')
                             this.j_check({
@@ -73,8 +104,8 @@ class SchoologyPage { //abstract class; template for each page
 
             } else if (limits.courses!=='$all' && this.time==='any') { //course page (all asgmts of course)
                 console.log(`Only checking the course: ${this.courses}`)
-                if (courses in this.checkedTasksGlobal) { //if checked asgmts of that course
-                    let asgmts=this.checkedTasksGlobal[this.courses];
+                if (courses in this.coursesGlobal) { //if checked asgmts of that course
+                    let asgmts=this.coursesGlobal[this.courses];
                     console.log('Asgmts', asgmts);
                     for (let asgmtEl of asgmts) {
                         let [infoEl, blockEl]=this.getAsgmtByName(asgmtEl);
@@ -89,6 +120,12 @@ class SchoologyPage { //abstract class; template for each page
                 }
             }
         });
+    }
+    checkAllAsgmtEl() {
+        throw new Error("Method not implemented.");
+    }
+    checkAllAsgmtElBeforeToday() {
+        throw new Error("Method not implemented.");
     }
     addCheckmarks({ //called in subclass' constructor, adds checkmarks to each asgmt for clicking; checks those checkmarks based on chrome storage
         asgmtElContainer, //where the asgmts are located
@@ -228,9 +265,9 @@ class SchoologyPage { //abstract class; template for each page
         return highlightGreen;
     }
 
-    updateCheckedTasks(checkedTasksGlobal) { //updates chrome's storage with checked tasks parameter
-        console.log('Updating to ', checkedTasksGlobal);
-        chrome.storage.sync.set({checkedTasks: checkedTasksGlobal});
+    updateCheckedTasks(coursesGlobal) { //updates chrome's storage with checked tasks parameter
+        console.log('Updating to ', coursesGlobal);
+        chrome.storage.sync.set({checkedTasks: coursesGlobal});
     }
-    static checkedTasksGlobal; //holds the checkedTasks variable globally in the class
+    static coursesGlobal; //holds the checkedTasks variable globally in the class
 }

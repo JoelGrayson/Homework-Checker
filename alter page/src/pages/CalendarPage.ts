@@ -1,4 +1,7 @@
-class CalendarPage extends SchoologyPage {
+import SchoologyPage from './SchoologyPage.js';
+import { removeSpaces } from '../functions.js';
+
+export default class CalendarPage extends SchoologyPage {
     constructor() {
         super({
             pageType: 'cal',
@@ -25,7 +28,7 @@ class CalendarPage extends SchoologyPage {
         document.querySelector('span.fc-button-next').addEventListener('click', reloadToCorrectMonthURL); //next month button
     
         function reloadToCorrectMonthURL() { //looks at `December 2021` or whatever the date is in text, converts to URL, and reloads page to that URL
-            let elText=document.querySelector('.fc-header-title').innerText;
+            let elText=( document.querySelector('.fc-header-title') as HTMLElement ).innerText;
             let [monthName, year]=elText.split(' ');
             let month;
 
@@ -109,8 +112,7 @@ class CalendarPage extends SchoologyPage {
         let pHighlight=asgmtEl.querySelector('.highlight-green'); //based on item inside asgmt
         const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
         let asgmtText=asgmtEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of asgmt (firstChild), not including inside grandchildren like innerText()
-        let courseText=asgmtEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
-        courseText=removeSpaces(courseText);
+        const courseText=removeSpaces(asgmtEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText); /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
         let newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
 
         if (newState) { //no highlight green already
@@ -121,13 +123,13 @@ class CalendarPage extends SchoologyPage {
             asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstElement)
             
             if (storeInChrome) {
-                if (courseText in this.checkedTasksGlobal) { //already exists, so append
-                    this.checkedTasksGlobal[courseText].push(asgmtText);
+                if (courseText in this.coursesGlobal) { //already exists, so append
+                    this.coursesGlobal[courseText].checked.push(asgmtText);
                 } else { //not exist, so create course log
-                    this.checkedTasksGlobal[courseText]=[];
-                    this.checkedTasksGlobal[courseText].push(asgmtText); //push to newly created class
+                    this.coursesGlobal[courseText].checked=[];
+                    this.coursesGlobal[courseText].checked.push(asgmtText); //push to newly created class
                 }
-                this.updateCheckedTasks(this.checkedTasksGlobal);
+                this.updateCheckedTasks(this.coursesGlobal);
             }
         } else {
             console.log(`Unchecking ${asgmtText}`);
@@ -135,9 +137,9 @@ class CalendarPage extends SchoologyPage {
             checkmarkEl.checked=false;
             asgmtEl.removeChild(pHighlight);
             
-            // checkedTasksGlobal.pop(checkedTasksGlobal.indexOf(asgmtText));
-            this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(asgmtText));
-            this.updateCheckedTasks(this.checkedTasksGlobal);
+            // coursesGlobal.pop(coursesGlobal.indexOf(asgmtText));
+            this.coursesGlobal[courseText].checked.pop(this.coursesGlobal[courseText].checked.indexOf(asgmtText));
+            this.updateCheckedTasks(this.coursesGlobal);
         }
     }
 }

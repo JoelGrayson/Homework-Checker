@@ -22,5 +22,9 @@
     "gulp-sass": "^5.1.0",
     "gulp-typescript": "^6.0.0-alpha.1",
     "sass": "^1.49.9"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.180",
+    "@types/jquery": "^3.5.14"
   }
 }

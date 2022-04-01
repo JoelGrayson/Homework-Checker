@@ -121,13 +121,13 @@ class CalendarPage extends SchoologyPage {
             asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstElement)
             
             if (storeInChrome) {
-                if (courseText in this.checkedTasksGlobal) { //already exists, so append
-                    this.checkedTasksGlobal[courseText].push(asgmtText);
+                if (courseText in this.coursesGlobal) { //already exists, so append
+                    this.coursesGlobal[courseText].push(asgmtText);
                 } else { //not exist, so create course log
-                    this.checkedTasksGlobal[courseText]=[];
-                    this.checkedTasksGlobal[courseText].push(asgmtText); //push to newly created class
+                    this.coursesGlobal[courseText]=[];
+                    this.coursesGlobal[courseText].push(asgmtText); //push to newly created class
                 }
-                this.updateCheckedTasks(this.checkedTasksGlobal);
+                this.updateCheckedTasks(this.coursesGlobal);
             }
         } else {
             console.log(`Unchecking ${asgmtText}`);
@@ -135,9 +135,9 @@ class CalendarPage extends SchoologyPage {
             checkmarkEl.checked=false;
             asgmtEl.removeChild(pHighlight);
             
-            // checkedTasksGlobal.pop(checkedTasksGlobal.indexOf(asgmtText));
-            this.checkedTasksGlobal[courseText].pop(this.checkedTasksGlobal[courseText].indexOf(asgmtText));
-            this.updateCheckedTasks(this.checkedTasksGlobal);
+            // coursesGlobal.pop(coursesGlobal.indexOf(asgmtText));
+            this.coursesGlobal[courseText].pop(this.coursesGlobal[courseText].indexOf(asgmtText));
+            this.updateCheckedTasks(this.coursesGlobal);
         }
     }
 }
