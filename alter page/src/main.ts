@@ -1,6 +1,6 @@
-import CalendarPage from './pages/CalendarPage.js';
-import HomePage from './pages/HomePage.js';
-import CoursePage from './pages/CoursePage.js';
+import CalendarPage from './pages/CalendarPage';
+import HomePage from './pages/HomePage';
+import CoursePage from './pages/CoursePage';
 
 //This script is injected into every page.
 //Functions are in sequential order

@@ -1,5 +1,5 @@
-import SchoologyPage from './SchoologyPage.js';
-import { removeSpaces } from '../functions.js';
+import SchoologyPage from './SchoologyPage';
+import { removeSpaces } from '../functions';
 
 export default class CoursePage extends SchoologyPage { //materials page (one course)
     courseId: string;

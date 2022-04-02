@@ -1,5 +1,5 @@
-import SchoologyPage from './SchoologyPage.js';
-import { removeSpaces } from '../functions.js';
+import SchoologyPage from './SchoologyPage';
+import { removeSpaces } from '../functions';
 
 export default class CalendarPage extends SchoologyPage {
     constructor() {
@@ -28,7 +28,8 @@ export default class CalendarPage extends SchoologyPage {
         document.querySelector('span.fc-button-next').addEventListener('click', reloadToCorrectMonthURL); //next month button
     
         function reloadToCorrectMonthURL() { //looks at `December 2021` or whatever the date is in text, converts to URL, and reloads page to that URL
-            let elText=( document.querySelector('.fc-header-title') as HTMLElement ).innerText;
+            const tempEl=document.querySelector('.fc-header-title')// as HTMLElement;
+            let elText=tempEl['innerText'];
             let [monthName, year]=elText.split(' ');
             let month;
 

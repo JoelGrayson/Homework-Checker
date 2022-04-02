@@ -2,22 +2,22 @@
 /// <reference types="chrome"/>
 
 interface Course {
-    name: string,
-    noSpacesName: string,
-    checked: string[], //checked assignments
+    name: string;
+    noSpacesName: string;
+    checked: string[]; //checked assignments
 }
 
 
 interface PageOptions {
-    pageType: string,
-    getAsgmtByNamePathEl: string | string[],
-    infoToBlockEl: Function,
+    pageType: string;
+    getAsgmtByNamePathEl: string | string[];
+    infoToBlockEl: Function;
     limits: {
         courses: string, //'$all' or course name
         time: 'any' | 'future'
-    },
-    ignoreOldAsgmts?: boolean,
-    multipleAsgmtContainers?: boolean
+    };
+    ignoreOldAsgmts?: boolean;
+    multipleAsgmtContainers?: boolean;
 }
 
 export default abstract class SchoologyPage {

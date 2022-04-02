@@ -12,13 +12,7 @@
             "matches": ["<all_urls>"],
             "js": [
                 "alter page/dist/injected/jquery.min.js",
-
-                "alter page/dist/pages/SchoologyPage.js",
-                "alter page/dist/pages/CalendarPage.js",
-                "alter page/dist/pages/CoursePage.js",
-                "alter page/dist/pages/collapseOverdue.js",
-                "alter page/dist/pages/HomePage.js",
-                "alter page/dist/main.js"
+                "alter page/dist/bundle.js"
             ],
             "css": [
                 "alter page/dist/injected/checkmark.css",

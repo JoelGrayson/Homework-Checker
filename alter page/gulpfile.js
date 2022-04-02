@@ -6,14 +6,31 @@ task('clean', ()=>(
 ));
 
 // .ts -> .js
-const ts=require('gulp-typescript');
-task('ts-build', ()=>(
-    src('./src/**/*.ts')
-        .pipe(ts())
-        .pipe(dest('./dist'))
-));
+task('ts-build', ()=>{
+    return new Promise((resolve, reject)=>{
+        const exec=require('child_process').exec;
+        exec('npm run bundle', (e, stdout, stderr)=>{
+            if (stderr)
+                console.log(stderr);
+            if (e)
+                console.log(e);
 
-task('copy-js', ()=>( 
+            resolve(stdout);
+        });
+    })
+});
+// * OLD gulp-typescript build:
+// const ts=require('gulp-typescript');
+// task('ts-build', ()=>(
+//     src('./src/**/*.ts')
+//         .pipe(ts({
+//             target: 'es2017' //es8
+//         }))
+//         .pipe(dest('./dist'))
+// ));
+
+
+task('copy-js', ()=>(  //just in case there is a .js file in src (none)
     src('./src/**/*.js')
         .pipe(dest('./dist'))
 ));

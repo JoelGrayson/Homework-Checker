@@ -1,6 +1,6 @@
-import SchoologyPage from './SchoologyPage.js';
-import collapseOverdue from './collapseOverdue.js';
-import { removeSpaces } from '../functions.js';
+import SchoologyPage from './SchoologyPage';
+import collapseOverdue from './collapseOverdue';
+import { removeSpaces } from '../functions';
 
 
 export default class HomePage extends SchoologyPage {
@@ -50,7 +50,9 @@ export default class HomePage extends SchoologyPage {
         const newState=forcedState ?? !pHighlight; //opposite when checking
 
         const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
-        const asgmtText: string=asgmtEl.querySelector('a').innerText;
+        
+        const tempAnchor=asgmtEl.querySelector('a') as HTMLAnchorElement;
+        const asgmtText: string=tempAnchor.innerText;
         const courseText=removeSpaces(asgmtEl.querySelector('h4>span').ariaLabel); //name of course based on aria-label of asgmtEl's <h4>'s <span>'s <div>
         // console.log({courseText, asgmtEl});
 
