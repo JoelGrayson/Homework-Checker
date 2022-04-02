@@ -92,11 +92,32 @@ task('sass-build-prod', ()=>( //sass -> css & compress css
         .pipe(dest('./dist/'))
 ));
 
-
+// Add note of mode
+const fs=require('fs');
+task('note-dev',  ()=>(
+    new Promise((resolve, reject)=>{
+        fs.writeFile('./dist/In Development', '', err=>{
+            if (err)
+                reject(err);
+            else
+                resolve(err);
+        });
+    })
+));
+task('note-prod',  ()=>(
+    new Promise((resolve, reject)=>{
+        fs.writeFile('./dist/In Production', '', err=>{
+            if (err)
+                reject(err);
+            else
+                resolve(err);
+        });
+    })
+));
 
 
 // Tasks to run
-const prodTasks=['clean', 'ts-build-background-prod', 'ts-build-prod', 'copy-js-prod', 'sass-build-prod'];
-const devTasks=['clean', 'ts-build-background-dev', 'ts-build-dev', 'copy-js-dev', 'sass-build-dev'];
+const prodTasks=['clean', 'note-prod', 'ts-build-background-prod', 'ts-build-prod', 'copy-js-prod', 'sass-build-prod'];
+const devTasks=['clean', 'note-dev', 'ts-build-background-dev', 'ts-build-dev', 'copy-js-dev', 'sass-build-dev'];
 task('prod', series(...prodTasks)); //separate minified files
 task('dev', series(...devTasks)); //one uncompressed file (errors at correct place in file for debugging)
