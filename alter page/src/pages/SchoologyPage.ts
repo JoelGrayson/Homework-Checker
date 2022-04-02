@@ -166,11 +166,15 @@ export default abstract class SchoologyPage {
      * @param course course name
      * @param asgmt assignment name
      */
-    addAsgmt(course: string, asgmt: string,
-        options: { createCourseIfNotExist?: boolean, noSpacesName?: boolean }={ createCourseIfNotExist: false, noSpacesName: true }
-    ) {
+    addAsgmt(course: string, asgmt: string, options: { createCourseIfNotExist?: boolean, noSpacesName?: boolean }) {
+        options.createCourseIfNotExist??=false;
+        options.noSpacesName??=true;
+
         if (options.createCourseIfNotExist && this.getCourse(course)===undefined) //create course if not exists
             this.createCourse(course, { save: false });
+        
+
+        console.log({noSpacesName: options.noSpacesName});
         this.getCourse(course, {noSpacesName: options.noSpacesName}).checked.push(asgmt);
         this.updateCourses();
     }
