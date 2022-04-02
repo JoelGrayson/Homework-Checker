@@ -6,12 +6,13 @@ interface Course {
     noSpacesName: string;
     checked: string[]; //checked assignments
 }
+type Assignment=[HTMLElement | 'No matches', HTMLElement | 'No matches']; //tuple of infoEl and blockEl
 
 
 interface PageOptions {
     pageType: string;
     getAsgmtByNamePathEl: string | string[];
-    infoToBlockEl: Function;
+    infoToBlockEl: (infoEl: HTMLElement)=>HTMLElement;
     limits: {
         courses: string, //'$all' or course name
         time: 'any' | 'future'
@@ -24,7 +25,7 @@ export default abstract class SchoologyPage {
     pageType: string; //public by default
     multipleAsgmtContainers: boolean;
     getAsgmtByNamePathEl: string | string[];
-    infoToBlockEl: Function;
+    infoToBlockEl: (infoEl: HTMLElement)=>HTMLElement; //how to get to infoEl from blockEl
     ignoreOldAsgmts: boolean;
     private time: string;
     courses: string; //abstract class; template for each page
@@ -64,22 +65,23 @@ export default abstract class SchoologyPage {
         }*/
 
         //listens for `run $cmd` message from popup.js
-        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ 
+        chrome.runtime.onMessage.addListener((msg, sender, response)=>{ //also onMessage in background.js
             if (msg.hasOwnProperty('run')) {
                 switch (msg.run) {
                     case 'reload':
                         location.reload();
                         break;
                     case 'check all asgmts':
-                        this.checkAllAsgmtEl();
+                        this.checkAllAsgmts();
                         break;
                     case 'check all asgmts before today':
-                        this.checkAllAsgmtElBeforeToday();
+                        this.checkAllAsgmtsBeforeToday();
                         break;
                     default:
                         console.error('Unknown run message:', msg.run)
                 }
             }
+            return true;
         });
         //Sets this.coursesGlobal to chrome storage
         chrome.storage.sync.get('courses', ({courses})=>{
@@ -119,14 +121,85 @@ export default abstract class SchoologyPage {
                     }
                 }
             }
+            return true;
         });
     }
-    checkAllAsgmtEl() {
+    checkAllAsgmts() {
         throw new Error("Method not implemented.");
     }
-    checkAllAsgmtElBeforeToday() {
+    checkAllAsgmtsBeforeToday() {
         throw new Error("Method not implemented.");
     }
+
+
+    //* <methods to interact with this.courseGlobal
+    getCourse(name: string): Course {
+        return this.coursesGlobal.find(course=>course.name===name);
+    }
+    createCourse(course: string, options?: {dontSave: boolean}) {
+        this.coursesGlobal.push({
+            name: course,
+            noSpacesName: '$Filler',
+            checked: []
+        });
+        if (!options.dontSave) //save unless specified to not save
+            this.updateCourses();
+    }
+    /**
+     * @param course name
+     * @returns course name
+    */
+    deleteCourse(name) {
+        delete this.coursesGlobal[
+            this.coursesGlobal.findIndex(course=>course.name===name) //get index
+        ];
+        this.updateCourses().then(()=>{
+            return name;
+        });
+    }
+    /**
+     * @param course course name
+     * @param asgmt assignment name
+     */
+    addAsgmt(course: string, asgmt: string, options?: { createCourseIfNotExist: boolean }) {
+        if (options.createCourseIfNotExist && this.getCourse(course)===undefined) //create course if not exists
+            this.createCourse(course, { dontSave: true });
+        this.getCourse(course).checked.push(asgmt);
+        this.updateCourses();
+    }
+    removeAsgmt(courseName, asgmt) {
+        this.getCourse(courseName).checked=this.getCourse(courseName).checked.filter(item=>(
+            item!==asgmt
+        ));
+        this.updateCourses().then(()=>{
+            return asgmt;
+        });
+    }
+    /**
+     * Updates chrome's storage with checked tasks parameter
+     * @returns Promise boolean succeeded?
+     * */
+     updateCourses(newCourses?: Course[]): Promise<boolean> {
+        newCourses=newCourses ?? this.coursesGlobal; //default is this.coursesGlobal
+
+        const data=JSON.stringify({courses: newCourses});
+        return new Promise((resolve, reject)=>{
+            chrome.runtime.sendMessage(
+                {
+                    run: 'update chrome storage',
+                    data
+                },
+                response=>{
+                    return resolve(response); //succeeded or not
+                }
+            );
+        })
+    }
+    //* >
+
+    
+    
+    
     addCheckmarks({ //called in subclass' constructor, adds checkmarks to each asgmt for clicking; checks those checkmarks based on chrome storage
         asgmtElContainer, //where the asgmts are located
         customMiddleScript, //anonymous func executed in the middle
@@ -155,7 +228,7 @@ export default abstract class SchoologyPage {
         }
     }
 
-    getAsgmtByName(asgmtName) { //returns DOMElement based on given string
+    getAsgmtByName(asgmtName): Assignment { //returns DOMElement based on given string
         let query, queryRes;
 
         console.log(asgmtName, this.multipleAsgmtContainers)
@@ -212,12 +285,10 @@ export default abstract class SchoologyPage {
             storeInChrome=true,
             animate=false //shows animation when checking
         }
-    }) {}
+    }): void {}
 
-    createGreenHighlightEl({ //creates highlightGreenEl with animate/no animate
-        pageType,
-        animate //: Boolean
-    }) {
+    //creates highlightGreenEl with animate/no animate
+    createGreenHighlightEl({ pageType, animate=true }: {pageType: string, animate?: boolean}): HTMLElement {
         const highlightGreen=document.createElement('div');
         highlightGreen.classList.add('highlight-green');
         highlightGreen.classList.add(`highlight-green-${pageType}`);
@@ -264,10 +335,4 @@ export default abstract class SchoologyPage {
         `;
         return highlightGreen;
     }
-
-    updateCheckedTasks(coursesGlobal) { //updates chrome's storage with checked tasks parameter
-        console.log('Updating to ', coursesGlobal);
-        chrome.storage.sync.set({checkedTasks: coursesGlobal});
-    }
-    static coursesGlobal; //holds the checkedTasks variable globally in the class
 }

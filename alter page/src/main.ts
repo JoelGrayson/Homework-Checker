@@ -10,9 +10,9 @@ window.addEventListener('load', determineSchoologyPageType, false); //wait for D
 
 
 function executeAfterDoneLoading(
-    callback, //executed after
+    callback: Function, //executed after
     isLoading=()=>document.querySelector('.upcoming-list>.refresh-wrapper img[alt="Loading"]')!=null //default is if there is no loading symbol on the page
-) { //executes callback after page is done loading
+): void { //executes callback after page is done loading
     let intervalID=setInterval(()=>{
         if (isLoading()) {
             // Continue waiting
@@ -27,7 +27,7 @@ function executeAfterDoneLoading(
     }, 100);
 }
 
-function determineSchoologyPageType() { //checks if page is a schoology calendar page before calling next
+function determineSchoologyPageType(): void { //checks if page is a schoology calendar page before calling next
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
     // console.log('1. Extension running');
     //Calendar
@@ -65,7 +65,7 @@ function determineSchoologyPageType() { //checks if page is a schoology calendar
 
 //<h1> CALENDAR
 //Resize event listener
-function waitForEventsLoaded() { //waits for calendar's events to load before calling next
+function waitForEventsLoaded(): void { //waits for calendar's events to load before calling next
     let checkIfEventsLoaded=setInterval(()=>{
         let calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=3; //more than three asgmts on calendar indicating asgmts loaded
         if (calendarEventsLoaded) {

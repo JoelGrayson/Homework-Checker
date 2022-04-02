@@ -72,7 +72,7 @@ export default class HomePage extends SchoologyPage {
                     this.coursesGlobal[courseText].checked=[];
                     this.coursesGlobal[courseText].checked.push(asgmtText); //push to newly created class
                 }
-                this.updateCheckedTasks(this.coursesGlobal);
+                this.updateCourses(this.coursesGlobal);
             }
         } else { //uncheck
             console.log(`Unchecking '${asgmtText}'`);
@@ -84,12 +84,12 @@ export default class HomePage extends SchoologyPage {
                 this.coursesGlobal[courseText].checked.pop( //remove checkedTaskGlobal from list
                     this.coursesGlobal[courseText].checked.indexOf(asgmtText)
                 );
-                this.updateCheckedTasks(this.coursesGlobal); //update
+                this.updateCourses(this.coursesGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
                     this.coursesGlobal[courseText].checked.pop(this.coursesGlobal[courseText].checked.indexOf(asgmtText));
-                    this.updateCheckedTasks(this.coursesGlobal);
+                    this.updateCourses(this.coursesGlobal);
                 }, 1000);
             }
         }

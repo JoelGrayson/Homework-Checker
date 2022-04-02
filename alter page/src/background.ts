@@ -9,12 +9,31 @@ chrome.runtime.onInstalled.addListener(()=>{
         },
         courses: [] //array of courses with checked asgmts
     });
-    setInterval(()=>{ //see data
-        chrome.storage.sync.get('courses', (data)=>{
-            console.log(data.courses);
-        })
-    }, 3000);
+
+    inspectData();
+
+    function inspectData() {
+        setInterval(()=>{ //see data
+            chrome.storage.sync.get(null, (data)=>{
+                console.log(data);
+            })
+        }, 3000);
+    }
 });
+
+//also onMessage in SchoologyPage.js
+chrome.runtime.onMessage.addListener((message, sender, sendRes)=>{
+    console.log({message, sender})
+    const data=JSON.parse(message.data);
+    if (message.run==='update chrome storage') {
+        chrome.storage.sync.set(data, ()=>{
+            console.log('Updated successfully key-value:', data);
+            return true;
+        });
+    }
+    return true;
+});
+
 
 chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and let know updated
     console.log({details});
@@ -23,6 +42,7 @@ chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and l
     });
     chrome.runtime.reload();
 });
+
 
 /*
 Schema:

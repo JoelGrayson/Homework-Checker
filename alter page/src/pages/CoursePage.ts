@@ -39,7 +39,7 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
             animate=false //shows animation when checking
         }
     }) { //forceState forces the check to be true/false
-        const pHighlight=!!asgmtEl.querySelector('.highlight-green'); //based on classList of asgmtEl
+        const pHighlight=<boolean> asgmtEl.querySelector('.highlight-green'); //based on classList of asgmtEl
         const newState=forcedState ?? !pHighlight; //opposite when checking
 
         const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
@@ -63,7 +63,7 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
                     this.coursesGlobal[this.courseName]=[];
                     this.coursesGlobal[this.courseName].push(asgmtText); //push to newly created class
                 }
-                this.updateCheckedTasks(this.coursesGlobal);
+                this.updateCourses(this.coursesGlobal);
             }
         } else { //uncheck
             console.log(`Unchecking ${asgmtText}`);
@@ -75,12 +75,12 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
                 this.coursesGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
                     this.coursesGlobal[this.courseName].indexOf(asgmtText)
                 );
-                this.updateCheckedTasks(this.coursesGlobal); //update
+                this.updateCourses(this.coursesGlobal); //update
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
                     this.coursesGlobal[this.courseName].pop(this.coursesGlobal[this.courseName].indexOf(asgmtText));
-                    this.updateCheckedTasks(this.coursesGlobal);
+                    this.updateCourses(this.coursesGlobal);
                 }, 1000);
             }
         }

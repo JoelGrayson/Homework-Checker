@@ -51,7 +51,7 @@ document.getElementById('checkAll').addEventListener('click', ()=>{
 //Uncheck all (reset) Button
 document.getElementById('resetBtn').addEventListener('click', async e=>{
     let data=await chrome.storage.sync.get(); //current settings
-    data.checkedTasks={}; //makes checkedTasks empty but keeps settings
+    data.courses={}; //makes courses empty but keeps settings
     chrome.storage.sync.set(data);
     sendMessage({run: 'reload'}); //reload page for changes to show
 });
