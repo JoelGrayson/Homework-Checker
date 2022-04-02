@@ -7,6 +7,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "gulp build",
         "bundle": "webpack",
+        "bundle-dev": "webpack --mode=development --devtool=inline-source-map",
         "serve": "webpack-dev-server"
     },
     "repository": {

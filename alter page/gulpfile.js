@@ -35,26 +35,25 @@ task('ts-build-background-prod', ()=>( //.ts -> .js & minify
 
 
 //* .ts -> .js  for content scripts
-task('ts-build-dev', ()=>( //webpack: non-background .ts -> minified bundle.js
-    new Promise((resolve, reject)=>{
-        const exec=require('child_process').exec;
-        exec('npm run bundle', (e, stdout, stderr)=>{
-            if (stderr)
-                console.log(stderr);
-            if (e)
-                console.log(e);
+function runCmd(script) { //returns anonymous function that returns a promise running command
+    return (
+        ()=>( //webpack: non-background .ts -> minified bundle.js
+            new Promise((resolve, reject)=>{
+                const exec=require('child_process').exec;
+                exec(script, (e, stdout, stderr)=>{
+                    if (stderr)
+                        console.log(stderr);
+                    if (e)
+                        console.log(e);
 
-            resolve(stdout);
-        });
-    })
-));
-task('ts-build-prod', ()=>( //.ts files -> each own uncompressed .js files
-    src('./src/**/[!background]*.ts') //all files except background.ts
-        .pipe(ts({
-            target: 'es2017' //es8
-        }))
-        .pipe(dest('./dist'))
-));
+                    resolve(stdout);
+                });
+            })
+        )
+    );
+}
+task('ts-build-dev', runCmd('npm run bundle-dev'));
+task('ts-build-prod', runCmd('npm run bundle'));
 
 
 //* just in case there is a .js file in src (none)
@@ -92,7 +91,6 @@ task('sass-build-prod', ()=>( //sass -> css & compress css
         }))
         .pipe(dest('./dist/'))
 ));
-
 
 
 
