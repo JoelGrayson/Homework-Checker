@@ -1,6 +1,8 @@
 /// <reference types="jquery"/>
 /// <reference types="chrome"/>
 
+import { removeSpaces } from '../functions';
+
 interface Course {
     name: string;
     noSpacesName: string;
@@ -20,7 +22,6 @@ interface PageOptions {
     ignoreOldAsgmts?: boolean;
     multipleAsgmtContainers?: boolean;
 }
-
 export default abstract class SchoologyPage {
     pageType: string; //public by default
     multipleAsgmtContainers: boolean;
@@ -106,18 +107,19 @@ export default abstract class SchoologyPage {
 
             } else if (limits.courses!=='$all' && this.time==='any') { //course page (all asgmts of course)
                 console.log(`Only checking the course: ${this.courses}`)
-                if (courses in this.coursesGlobal) { //if checked asgmts of that course
-                    let asgmts=this.coursesGlobal[this.courses];
-                    console.log('Asgmts', asgmts);
-                    for (let asgmtEl of asgmts) {
-                        let [infoEl, blockEl]=this.getAsgmtByName(asgmtEl);
-                        if (infoEl!=='No matches')
-                            this.j_check({
-                                asgmtEl: blockEl,
-                                options: {
-                                    storeInChrome: false,
-                                }
-                            });
+                for (let courseName of courses) { //check all assignments of all specified courses
+                    let course=this.getCourse(courseName);
+                    if (course!=undefined) { //if the course exists
+                        for (let asgmt of course.checked) {
+                            let [infoEl, blockEl]=this.getAsgmtByName(asgmt);
+                            if (infoEl!=='No matches')
+                                this.j_check({
+                                    asgmtEl: blockEl,
+                                    options: {
+                                        storeInChrome: false,
+                                    }
+                                });
+                        }
                     }
                 }
             }
@@ -133,16 +135,19 @@ export default abstract class SchoologyPage {
 
 
     //* <methods to interact with this.courseGlobal
-    getCourse(name: string): Course {
+    getCourse(name: string, options={ noSpacesName: true }): Course {
+        if (options.noSpacesName)
+            return this.coursesGlobal.find(course=>removeSpaces(course.name)===removeSpaces(name)); //compare space-less names
         return this.coursesGlobal.find(course=>course.name===name);
     }
-    createCourse(course: string, options?: {dontSave: boolean}) {
+    createCourse(course: string, options={save: true}) {
+        console.log('Creating course', course)
         this.coursesGlobal.push({
             name: course,
-            noSpacesName: '$Filler',
+            noSpacesName: removeSpaces(course),
             checked: []
         });
-        if (!options.dontSave) //save unless specified to not save
+        if (options.save) //save unless specified to not save
             this.updateCourses();
     }
     /**
@@ -161,10 +166,12 @@ export default abstract class SchoologyPage {
      * @param course course name
      * @param asgmt assignment name
      */
-    addAsgmt(course: string, asgmt: string, options?: { createCourseIfNotExist: boolean }) {
+    addAsgmt(course: string, asgmt: string,
+        options: { createCourseIfNotExist?: boolean, noSpacesName?: boolean }={ createCourseIfNotExist: false, noSpacesName: true }
+    ) {
         if (options.createCourseIfNotExist && this.getCourse(course)===undefined) //create course if not exists
-            this.createCourse(course, { dontSave: true });
-        this.getCourse(course).checked.push(asgmt);
+            this.createCourse(course, { save: false });
+        this.getCourse(course, {noSpacesName: options.noSpacesName}).checked.push(asgmt);
         this.updateCourses();
     }
     removeAsgmt(courseName, asgmt) {

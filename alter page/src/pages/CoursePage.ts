@@ -56,15 +56,8 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
             asgmtEl.querySelector('h4').style.position='relative'; //so that text above checkmark
             asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstChild)
  
-            if (storeInChrome) {
-                if (this.courseName in this.coursesGlobal) { //already exists, so append
-                    this.coursesGlobal[this.courseName].push(asgmtText);
-                } else { //not exist, so create course log
-                    this.coursesGlobal[this.courseName]=[];
-                    this.coursesGlobal[this.courseName].push(asgmtText); //push to newly created class
-                }
-                this.updateCourses(this.coursesGlobal);
-            }
+            if (storeInChrome)
+                this.addAsgmt(this.courseName, asgmtText, {createCourseIfNotExist: true });
         } else { //uncheck
             console.log(`Unchecking ${asgmtText}`);
             checkmarkEl.checked=false;
@@ -72,15 +65,11 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
             toRemove.parentNode.removeChild(toRemove);            
 
             try {
-                this.coursesGlobal[this.courseName].pop( //remove checkedTaskGlobal from list
-                    this.coursesGlobal[this.courseName].indexOf(asgmtText)
-                );
-                this.updateCourses(this.coursesGlobal); //update
+                this.removeAsgmt(this.courseName, asgmtText);
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
-                    this.coursesGlobal[this.courseName].pop(this.coursesGlobal[this.courseName].indexOf(asgmtText));
-                    this.updateCourses(this.coursesGlobal);
+                    this.removeAsgmt(this.courseName, asgmtText);
                 }, 1000);
             }
         }

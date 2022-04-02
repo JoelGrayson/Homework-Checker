@@ -1,7 +1,5 @@
 import SchoologyPage from './SchoologyPage';
 import collapseOverdue from './collapseOverdue';
-import { removeSpaces } from '../functions';
-
 
 export default class HomePage extends SchoologyPage {
     constructor({containerSelectors}) { //array of selectors (overdue and upcoming)
@@ -53,8 +51,8 @@ export default class HomePage extends SchoologyPage {
         
         const tempAnchor=asgmtEl.querySelector('a') as HTMLAnchorElement;
         const asgmtText: string=tempAnchor.innerText;
-        const courseText=removeSpaces(asgmtEl.querySelector('h4>span').ariaLabel); //name of course based on aria-label of asgmtEl's <h4>'s <span>'s <div>
-        // console.log({courseText, asgmtEl});
+        const courseName=(asgmtEl.querySelector('h4>span').ariaLabel); //name of course based on aria-label of asgmtEl's <h4>'s <span>'s <div>
+            // differs from courseName on calendar, so use space-less version for comparison
 
         if (newState) { //check
             console.log(`Checking '${asgmtText}'`);
@@ -65,15 +63,8 @@ export default class HomePage extends SchoologyPage {
             asgmtEl.querySelector('h4>span').style.position='relative'; //so that text above checkmark
             parent.insertBefore(highlightGreenEl, parent.firstChild); //insert as first element (before firstElement)
            
-            if (storeInChrome) {
-                if (courseText in this.coursesGlobal) { //already exists, so append
-                    this.coursesGlobal[courseText].checked.push(asgmtText);
-                } else { //not exist, so create course log
-                    this.coursesGlobal[courseText].checked=[];
-                    this.coursesGlobal[courseText].checked.push(asgmtText); //push to newly created class
-                }
-                this.updateCourses(this.coursesGlobal);
-            }
+            if (storeInChrome)
+                this.addAsgmt(courseName, asgmtText, {createCourseIfNotExist: true});
         } else { //uncheck
             console.log(`Unchecking '${asgmtText}'`);
             checkmarkEl.checked=false;
@@ -81,15 +72,11 @@ export default class HomePage extends SchoologyPage {
             toRemove.parentNode.removeChild(toRemove);
             
             try {
-                this.coursesGlobal[courseText].checked.pop( //remove checkedTaskGlobal from list
-                    this.coursesGlobal[courseText].checked.indexOf(asgmtText)
-                );
-                this.updateCourses(this.coursesGlobal); //update
+                this.removeAsgmt(courseName, asgmtText);
             } catch (err) {
                 console.error(err);
                 setTimeout(()=>{ //do same thing a second later
-                    this.coursesGlobal[courseText].checked.pop(this.coursesGlobal[courseText].checked.indexOf(asgmtText));
-                    this.updateCourses(this.coursesGlobal);
+                    this.removeAsgmt(courseName, asgmtText);
                 }, 1000);
             }
         }

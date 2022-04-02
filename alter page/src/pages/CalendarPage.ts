@@ -1,5 +1,4 @@
 import SchoologyPage from './SchoologyPage';
-import { removeSpaces } from '../functions';
 
 export default class CalendarPage extends SchoologyPage {
     constructor() {
@@ -113,7 +112,7 @@ export default class CalendarPage extends SchoologyPage {
         const pHighlight=asgmtEl.querySelector('.highlight-green'); //based on item inside asgmt
         const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
         const asgmtText=asgmtEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of asgmt (firstChild), not including inside grandchildren like innerText()
-        const courseText=removeSpaces(asgmtEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText); /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
+        const courseName=asgmtEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
         const newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
 
         if (newState) { //no highlight green already
@@ -124,7 +123,7 @@ export default class CalendarPage extends SchoologyPage {
             asgmtEl.insertBefore(highlightGreenEl, asgmtEl.firstChild); //insert as first element (before firstElement)
             
             if (storeInChrome)
-                this.addAsgmt(courseText, asgmtText, {createCourseIfNotExist: true});
+                this.addAsgmt(courseName, asgmtText, {createCourseIfNotExist: true });
         } else {
             console.log(`Unchecking ${asgmtText}`);
             //Uncheck
@@ -132,7 +131,7 @@ export default class CalendarPage extends SchoologyPage {
             asgmtEl.removeChild(pHighlight);
             
             // coursesGlobal.pop(coursesGlobal.indexOf(asgmtText));
-            this.removeAsgmt(courseText, asgmtText);
+            this.removeAsgmt(courseName, asgmtText);
         }
     }
 }
