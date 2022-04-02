@@ -12,7 +12,7 @@
             "matches": ["<all_urls>"],
             "js": [
                 "alter page/dist/injected/jquery.min.js",
-                "alter page/dist/bundle.js"
+                "alter page/dist/content script bundle.js"
             ],
             "css": [
                 "alter page/dist/injected/checkmark.css",

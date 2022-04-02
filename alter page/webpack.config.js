@@ -6,7 +6,7 @@ module.exports={
     module: {
         rules: [
             {
-                test: /\.ts$/,
+                test: /(?<!background)\.ts$/, //exclude background page
                 include: [
                     path.resolve(__dirname, 'src')
                 ],
@@ -19,7 +19,7 @@ module.exports={
     },
     output: {
         publicPath: 'dist',
-        filename: 'bundle.js',
+        filename: 'content script bundle.js',
         path: path.resolve(__dirname, 'dist')
     }
 };
