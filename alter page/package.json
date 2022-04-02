@@ -5,9 +5,10 @@
     "main": "dist/main.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "gulp build",
+        "build": "echo 'run \"gulp dev\" or \"gulp prod\"'",
         "bundle": "webpack",
         "bundle-dev": "webpack --mode=development --devtool=inline-source-map",
+        "bundle-dev-watch": "webpack --watch --mode=development --devtool=inline-source-map",
         "serve": "webpack-dev-server"
     },
     "repository": {

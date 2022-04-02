@@ -54,6 +54,7 @@ function runCmd(script) { //returns anonymous function that returns a promise ru
 }
 task('ts-build-dev', runCmd('npm run bundle-dev'));
 task('ts-build-prod', runCmd('npm run bundle'));
+task('ts-build-dev-watch', runCmd('npm run bundle-dev-watch'));
 
 
 //* just in case there is a .js file in src (none)
@@ -119,5 +120,7 @@ task('note-prod',  ()=>(
 // Tasks to run
 const prodTasks=['clean', 'note-prod', 'ts-build-background-prod', 'ts-build-prod', 'copy-js-prod', 'sass-build-prod'];
 const devTasks=['clean', 'note-dev', 'ts-build-background-dev', 'ts-build-dev', 'copy-js-dev', 'sass-build-dev'];
+const devWatchTasks=['clean', 'note-dev', 'ts-build-background-dev', 'copy-js-dev', 'sass-build-dev', 'ts-build-dev-watch']; //watch one last, so prev tasks can complete   
 task('prod', series(...prodTasks)); //separate minified files
 task('dev', series(...devTasks)); //one uncompressed file (errors at correct place in file for debugging)
+task('dev-watch', series(...devWatchTasks)); //watches for changes in content files (webpack)
