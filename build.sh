@@ -46,10 +46,16 @@ do
     fi
 done
 
+# Delete unnecessary files & folders
+rm -rf "$dest/alter page/src" "$dest/alter page/node_modules"
+rm "$dest/alter page/gulpfile.js" "$dest/alter page/package-lock.json" "$dest/alter page/package.json" "$dest/alter page/tsconfig.json" "$dest/alter page/webpack.config.js"
+
+
+
 echo "✅ Build Complete"
-echo "Compressing..."
-tar -zcf "../build/$name.tar.gz" "../build/$name"
-echo "✅ Compressing complete"
+# echo "Compressing..."
+# tar -czf "../build/$name.tar.gz" "$dest"
+# echo "✅ Compressing complete"
 
 open "../build"
 
