@@ -89,6 +89,7 @@ export default abstract class SchoologyPage {
             this.coursesGlobal=courses;
             console.log('courses', courses);
             console.log(limits); //time & course limits when getting asgmts
+            
             if (limits.courses==='$all' && limits.time==='any') { //calendar or home page
                 for (let course of courses) { //TODO: change schema
                     let checked=course.checked; //asgmts
@@ -103,23 +104,24 @@ export default abstract class SchoologyPage {
                             });
                     }
                 }
-            } else if (limits.courses==='$all' && this.time==='future') { //not being used, potential if not prev asgmts
+            } else if (limits.courses==='$all' && limits.time==='future') { //not being used, potential if not prev asgmts
 
-            } else if (limits.courses!=='$all' && this.time==='any') { //course page (all asgmts of course)
-                console.log(`Only checking the course: ${this.courses}`)
-                for (let courseName of courses) { //check all assignments of all specified courses
-                    let course=this.getCourse(courseName);
-                    if (course!=undefined) { //if the course exists
-                        for (let asgmt of course.checked) {
-                            let [infoEl, blockEl]=this.getAsgmtByName(asgmt);
-                            if (infoEl!=='No matches')
-                                this.j_check({
-                                    asgmtEl: blockEl,
-                                    options: {
-                                        storeInChrome: false,
-                                    }
-                                });
-                        }
+            } else if (limits.courses!=='$all' && limits.time==='any') { //course page (all asgmts of course)
+                const courseName=limits.courses; //single course string
+                console.log(`Only checking asgmts of the course: ${courseName}`);
+                const course=this.getCourse(courseName); //if course is undefined, it has not been created yet because there are no checked tasks
+                console.log('m1', {course})
+                if (course!=undefined) { //if the course exists
+                    for (let asgmt of course.checked) {
+                        console.log('m2', {asgmt});
+                        const [infoEl, blockEl]=this.getAsgmtByName(asgmt);
+                        if (infoEl!=='No matches' && blockEl!=='No matches')
+                            this.j_check({
+                                asgmtEl: blockEl,
+                                options: {
+                                    storeInChrome: false,
+                                }
+                            });
                     }
                 }
             }
@@ -190,7 +192,7 @@ export default abstract class SchoologyPage {
      * Updates chrome's storage with checked tasks parameter
      * @returns Promise boolean succeeded?
      * */
-     updateCourses(newCourses?: Course[]): Promise<boolean> {
+    updateCourses(newCourses?: Course[]): Promise<boolean> {
         newCourses=newCourses ?? this.coursesGlobal; //default is this.coursesGlobal
 
         const data=JSON.stringify({courses: newCourses});

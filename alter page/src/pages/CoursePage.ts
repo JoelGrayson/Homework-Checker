@@ -2,13 +2,12 @@ import SchoologyPage from './SchoologyPage';
 import { removeSpaces } from '../functions';
 
 export default class CoursePage extends SchoologyPage { //materials page (one course)
-    courseId: string;
-    courseName: string;
+    private courseId: string;
+    private courseName: string;
     
     constructor(courseId) {
-        let containerPath=`#course-events .upcoming-list .upcoming-events .upcoming-list`;
-        let courseName=(document.querySelector('#center-top>.page-title') as HTMLElement).innerText; //grabs course title
-        courseName=removeSpaces(courseName);
+        const containerPath=`#course-events .upcoming-list .upcoming-events .upcoming-list`;
+        const courseName=removeSpaces((document.querySelector('#center-top>.page-title') as HTMLElement).innerText); //grabs course title & removes space
 
         super({
             pageType: 'course',
@@ -19,6 +18,7 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
                 time: 'any'
             }
         });
+        
         this.courseId=courseId;
         this.courseName=courseName;
 
