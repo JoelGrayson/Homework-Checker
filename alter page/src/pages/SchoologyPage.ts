@@ -341,9 +341,6 @@ export default abstract class SchoologyPage {
                     />`:''
                 }
                 </path>
-                <path stroke='green' d='M 0 0 L 10 10 Z'>
-                    
-                </path>
             </svg>
         `;
         return highlightGreen;
