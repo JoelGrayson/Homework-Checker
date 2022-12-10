@@ -15,6 +15,7 @@ Add on the chrome web store: https://chrome.google.com/webstore/detail/homework-
     * Edit `alter page/src`.
     * Load unpacked in `chrome://extensions` for the `Homework Checker/` directory.
 * Run `./build.sh` when ready to deploy.
+* Then, compress the folder and upload the .zip file to the Chrome Web Store Developer Dashboard. If the website says the .zip is invalid, compress the folder on an older mac because the newest mac has a different compression algorithm.
 
 ### Alter Page
 Run `gulp dev` for a readable development mode
