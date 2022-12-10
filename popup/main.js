@@ -44,11 +44,11 @@ overdueCollapsed.addEventListener('change', async ()=>{
 
 //*|| Button EventListeners
 //Check all asgmts
-document.getElementById('checkAll').addEventListener('click', ()=>{
-    sendMessage({run: 'check all asgmts'});
-});
+// document.getElementById('checkAll').addEventListener('click', ()=>{
+//     sendMessage({run: 'check all asgmts'});
+// });
 
-//Uncheck all (reset) Button
+//Uncheck All Assignments (reset) Button
 document.getElementById('resetBtn').addEventListener('click', async e=>{
     let data=await chrome.storage.sync.get(); //current settings
     data.courses={}; //makes courses empty but keeps settings
@@ -57,9 +57,9 @@ document.getElementById('resetBtn').addEventListener('click', async e=>{
 });
 
 //check all asgmts before today
-document.getElementById('checkAllBeforeToday').addEventListener('click', ()=>{
-    sendMessage({run: 'check all asgmts before today'});
-});
+// document.getElementById('checkAllBeforeToday').addEventListener('click', ()=>{
+//     sendMessage({run: 'check all asgmts before today'});
+// });
 
 
 
