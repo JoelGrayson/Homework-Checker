@@ -3,3 +3,4 @@ private/*
 **/*.css.map
 **/node_modules
 **/dist
+# build/**

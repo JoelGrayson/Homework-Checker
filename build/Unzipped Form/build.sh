@@ -11,24 +11,11 @@ cd ..
 
 
 #* || Empty Build Folder (clear or create)
-if [[ $(ls -d "$TEMP_DEST") == "$TEMP_DEST" ]]; then #if exists, delete
-    # There is a build folder
-    echo There is a build folder
-    read -rp "Erase it? (y/n) " confirmation
-
-    if [[ "$confirmation" != "y" ]]
-    then
-        echo "Will not erase, exiting."
-        exit 0
-    fi
-    
-    echo Removing previous build folder
-    rm -rf "$TEMP_DEST" #deletes everything
-    rm -rf "$FINAL_DEST"
-fi
+echo Removing previous build folder
+rm -rf "$TEMP_DEST" #deletes everything
+rm -rf "$FINAL_DEST"
 
 mkdir $TEMP_DEST #fresh empty outer directory
-
 
 #* || Copying Files
 for file in $(ls -p | grep -v /) #list only files in this directory
@@ -49,18 +36,21 @@ do
     fi
 done
 
-
-# Delete unnecessary files & folders
+#* || Delete unnecessary files & folders
 rm -rf "$TEMP_DEST/alter page/node_modules" "$TEMP_DEST/build"
 rm "$TEMP_DEST/alter page/gulpfile.js" "$TEMP_DEST/alter page/package-lock.json" "$TEMP_DEST/alter page/package.json" "$TEMP_DEST/alter page/tsconfig.json" "$TEMP_DEST/alter page/webpack.config.js"
 
 mv "$TEMP_DEST" "$FINAL_DEST"
 
 echo "✅ Build Complete"
-# echo "Compressing..."
-# tar -czf "$TEMP_DEST/$name.tar.gz" "$TEMP_DEST"
-# echo "✅ Compressing complete"
-
+echo "Compressing..."
+name="Homework Checker (Schoology)"
+tar -czf "$name.tgz" "$FINAL_DEST"
+echo "✅ Compressing complete"
+mkdir "$FINAL_DEST/Unzipped Form"
+mv "$FINAL_DEST"/* "$FINAL_DEST/Unzipped Form"
+mv "$FINAL_DEST/Unzipped Form/$name.tar.gz" "$FINAL_DEST/"
+mv "$name.tgz" "$FINAL_DEST"
 open "$FINAL_DEST"
 
 echo 'display notification "Ready to upload zipped extension to web store" with title "Build.sh"' | osascript

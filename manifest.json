@@ -1,7 +1,7 @@
 {
     "name": "Homework Checker (Schoology)",
     "description": "Stay organized. Check off assignments like a todo-list.",
-    "version": "5.0",
+    "version": "5.1",
     "manifest_version": 3,
     "author": "Joel Grayson",
     "background": {
