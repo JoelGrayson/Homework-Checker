@@ -11,6 +11,8 @@ Add on the chrome web store: https://chrome.google.com/webstore/detail/homework-
 
 
 ## For Developers
+Edit `alter page/src`.
+Load unpacked in `chrome://extensions` for the `Homework Checker/` directory.
 ### Alter Page
 Run `gulp dev` for a readable development mode
 or `gulp prod` for a production mode

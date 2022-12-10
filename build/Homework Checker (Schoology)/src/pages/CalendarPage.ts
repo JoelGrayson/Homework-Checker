@@ -5,7 +5,7 @@ export default class CalendarPage extends SchoologyPage {
         super({
             pageType: 'cal',
             getAsgmtByNamePathEl: 'span.fc-event-title>span',
-            infoToBlockEl: el=>(el.parentNode!.parentNode!.parentNode as HTMLElement),
+            infoToBlockEl: el=>(el.parentNode.parentNode.parentNode as HTMLElement),
             limits: {
                 courses: '$all',
                 time: 'any'
@@ -13,7 +13,7 @@ export default class CalendarPage extends SchoologyPage {
         });
 
         this.addCheckmarks({
-            asgmtElContainer: (document.querySelector('div.fc-event>div.fc-event-inner') as HTMLDivElement).parentNode!.parentNode,
+            asgmtElContainer: document.querySelector('div.fc-event>div.fc-event-inner').parentNode.parentNode,
             customMiddleScript: (checkEl, asgmtEl)=>{
                 jQuery(checkEl).on('click', e=>{ //prevent asgmt dialog from opening when clicking checkmark
                     e.stopPropagation();
@@ -23,11 +23,11 @@ export default class CalendarPage extends SchoologyPage {
         });
 
         //When changing months, reload page
-        (document.querySelector('span.fc-button-prev') as HTMLSpanElement).addEventListener('click', reloadToCorrectMonthURL); //previous month button
-        (document.querySelector('span.fc-button-next') as HTMLSpanElement).addEventListener('click', reloadToCorrectMonthURL); //next month button
+        document.querySelector('span.fc-button-prev').addEventListener('click', reloadToCorrectMonthURL); //previous month button
+        document.querySelector('span.fc-button-next').addEventListener('click', reloadToCorrectMonthURL); //next month button
     
         function reloadToCorrectMonthURL() { //looks at `December 2021` or whatever the date is in text, converts to URL, and reloads page to that URL
-            const tempEl=document.querySelector('.fc-header-title') as HTMLSpanElement; // as HTMLElement;
+            const tempEl=document.querySelector('.fc-header-title')// as HTMLElement;
             let elText=tempEl['innerText'];
             let [monthName, year]=elText.split(' ');
             let month;
@@ -68,7 +68,7 @@ export default class CalendarPage extends SchoologyPage {
     checkAllAsgmts() {
         const elementsByDate=jQuery(`span[class*='day-']`);
         for (let el of elementsByDate) {
-            let asgmtEl=el.parentNode!.parentNode!.parentNode!.parentNode!.parentNode!.parentNode as HTMLElement;
+            let asgmtEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
             if (asgmtEl!=null)
                 this.j_check({
                     asgmtEl,
@@ -88,7 +88,7 @@ export default class CalendarPage extends SchoologyPage {
             const beforeToday=dayOfEl<today;
 
             if (beforeToday) { //before today
-                const asgmtEl=el.parentNode!.parentNode!.parentNode!.parentNode!.parentNode!.parentNode as HTMLElement;
+                const asgmtEl=el.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
                 if (asgmtEl!=null)
                     this.j_check({ //forcedState is true
                         asgmtEl,
@@ -107,19 +107,12 @@ export default class CalendarPage extends SchoologyPage {
             storeInChrome=true,
             animate=false //shows animation when checking
         }
-    }: {
-        asgmtEl: HTMLElement;
-        forcedState?: boolean | null;
-        options: {
-            storeInChrome?: boolean;
-            animate?: boolean;
-        }
     }) { //checks/unchecks passed in element
         //storeInChrome indicates whether or not to send request to store in chrome. is false when extension initializing & checking off prior asgmts from storage. is true all other times
         const pHighlight=asgmtEl.querySelector('.highlight-green'); //based on item inside asgmt
-        const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`) as HTMLInputElement;
-        const asgmtText=(asgmtEl.querySelector('.fc-event-inner>.fc-event-title>span') as HTMLSpanElement).firstChild!.nodeValue; //only value of asgmt (firstChild), not including inside grandchildren like innerText()
-        const courseName=(asgmtEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`) as HTMLSpanElement).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
+        const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
+        const asgmtText=asgmtEl.querySelector('.fc-event-inner>.fc-event-title>span').firstChild.nodeValue; //only value of asgmt (firstChild), not including inside grandchildren like innerText()
+        const courseName=asgmtEl.querySelector(`.fc-event-inner>.fc-event-title span[class*='realm-title']`).innerText; /* most child span can have class of realm-title-user or realm-title-course based on whether or not it is a personal event */
         const newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
 
         if (newState) { //no highlight green already

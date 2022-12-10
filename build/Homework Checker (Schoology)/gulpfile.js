@@ -118,8 +118,8 @@ task('note-prod',  ()=>(
 
 
 // Tasks to run
-const prodTasks    =['clean', 'note-prod', 'ts-build-background-prod', 'ts-build-prod', 'copy-js-prod', 'sass-build-prod'];
-const devTasks     =['clean', 'note-dev', 'ts-build-background-dev', 'ts-build-dev', 'copy-js-dev', 'sass-build-dev'];
+const prodTasks=['clean', 'note-prod', 'ts-build-background-prod', 'ts-build-prod', 'copy-js-prod', 'sass-build-prod'];
+const devTasks=['clean', 'note-dev', 'ts-build-background-dev', 'ts-build-dev', 'copy-js-dev', 'sass-build-dev'];
 const devWatchTasks=['clean', 'note-dev', 'ts-build-background-dev', 'copy-js-dev', 'sass-build-dev', 'ts-build-dev-watch']; //watch one last, so prev tasks can complete   
 task('prod', series(...prodTasks)); //separate minified files
 task('dev', series(...devTasks)); //one uncompressed file (errors at correct place in file for debugging)

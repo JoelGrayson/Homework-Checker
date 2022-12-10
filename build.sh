@@ -2,7 +2,10 @@
 
 # ABOUT: Builds for uploading to web store. Ignores certain files
 
-# TODO: Grunt script
+cd "./alter page/"
+gulp prod
+cd ..
+
 
 #* || Empty Build Folder (clear or create)
 if [[ $(ls -d ../build) == "../build" ]]; then #if exists, delete
@@ -46,8 +49,10 @@ do
     fi
 done
 
+
+
 # Delete unnecessary files & folders
-rm -rf "$dest/alter page/src" "$dest/alter page/node_modules"
+rm -rf "$dest/alter page/node_modules"
 rm "$dest/alter page/gulpfile.js" "$dest/alter page/package-lock.json" "$dest/alter page/package.json" "$dest/alter page/tsconfig.json" "$dest/alter page/webpack.config.js"
 
 

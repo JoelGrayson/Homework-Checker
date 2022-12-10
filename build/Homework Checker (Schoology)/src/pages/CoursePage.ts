@@ -30,12 +30,6 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
             },
             locateElToAppendCheckmarkTo: el=>el.firstChild
         });
-
-        // Revives when checkmarks disappear or are not there. When loading, sometimes the DOM needs a while to add
-        setInterval(()=>{
-            if (!document.querySelector('.j_check_course')) //checkmarks don't exist anymore
-                new CoursePage(courseId); //revive checkmarks
-        }, 500);
     }
     j_check({
         asgmtEl,

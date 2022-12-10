@@ -26,14 +26,13 @@ export default function collapseOverdue() { //sets up
             });
         }
     
-        const initialVal=await get();
+        let initialVal=await get();
     
-        const container=document.querySelector(overdueWrapperPath+'>h3') as HTMLHeadingElement;
+        const container=document.querySelector(overdueWrapperPath+'>h3');
         const collapseBtn=document.createElement('button');
             collapseBtn.style.marginLeft='4rem'; //distance between text
             collapseBtn.innerText='Hide Overdue Assignments';
             collapseBtn.classList.add('j_button');
-            collapseBtn.classList.add('j_collapse-button');
             collapseBtn.addEventListener('click', async ()=>{
                 const newVal=!(await get()); //opposite of oldVal
                 rerenderCollapseBtn(newVal);

@@ -1,0 +1,90 @@
+//*|| Highlight Green Specific Platform Style
+.highlight-green
+    width: 100%
+    height: 100%
+    position: absolute
+
+.highlight-green-cal
+    z-index: 10
+    opacity: 0.6
+
+.highlight-green-home
+    top: 0
+    left: 0
+
+.highlight-green-course
+    top: 0
+    left: 0
+
+
+//*|| All J_Checkmarks
+$size: 15px //checkmark
+$p: 6px //padding around checkmark that is clickable
+
+input[class^="j_check_"]
+    &::before //checkmark (covers original)
+        content: ''
+        display: block
+        position: relative
+        top: 0
+        left: 0
+
+        width: $size
+        height: $size
+        background-color: white
+        border: 1px solid #555
+        border-radius: 3px
+        cursor: pointer
+
+    &::after //clickable area (greater than checkmark)
+        content: ''
+        width: calc(#{$p} + #{$size} + #{$p})
+        height: calc(#{$p} + #{$size} + #{$p})
+        position: absolute
+        //offset width
+        top: calc(-1 * #{$p})
+        left: calc(-1 * #{$p})
+
+    
+    &:hover //little darker onHover
+        &::before
+            background-color: #dbe6de
+    
+    &:active //more darker when user clicking (active)
+        &::before
+            background-color: #a6ccac
+    
+    &:checked
+        &::before //checkmark
+            background-color: #05d74b
+            border: 1px solid #077a2d
+            border-radius: 3px
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 100 100'><path d='M 13 60 L 39 80 L 88 20' fill='none' stroke='black' stroke-width='13' stroke-linecap='round' stroke-linejoin='round' /></svg>")
+        &:hover
+            &::before
+                background-color: #01a036
+        &:active
+            &::before
+                background-color: #018f30
+
+
+
+//*|| Specific Page J_Checkmarks
+//* Calendar
+.j_check_cal
+    position: absolute
+    zoom: 0.8
+    right: 8px
+    bottom: 8px    
+    z-index: 11
+    border: 1.3px solid #333
+
+//* Course
+.j_check_course
+    zoom: 0.93
+
+//* Home
+.j_check_home //has .j_check_container
+    zoom: 0.93
+    position: relative //so that after is in center
+

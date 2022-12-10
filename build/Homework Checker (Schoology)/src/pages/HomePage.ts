@@ -14,8 +14,7 @@ export default class HomePage extends SchoologyPage {
             multipleAsgmtContainers: true
         });
 
-        if (!document.querySelector('.j_collapse-button')) //only add button if not already existing
-            collapseOverdue();
+        collapseOverdue();
 
         for (let containerSelector of containerSelectors) {
             let selector=`h4>span`;
@@ -35,12 +34,6 @@ export default class HomePage extends SchoologyPage {
                 locateElToAppendCheckmarkTo: el=>el.querySelector(`${selector} span.${containerClass}`),
             });
         }
-    
-        // Revives when checkmarks disappear or are not there. When loading, sometimes the DOM needs a while to add
-        setInterval(()=>{
-            if (!document.querySelector('.j_check_home')) //checkmarks don't exist anymore
-                new HomePage({containerSelectors}); //revive checkmarks
-        }, 300);
     }
     j_check({
         asgmtEl,
