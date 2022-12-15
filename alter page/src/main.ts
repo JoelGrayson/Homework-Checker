@@ -67,7 +67,7 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
 //Resize event listener
 function waitForEventsLoaded(): void { //waits for calendar's events to load before calling next
     let checkIfEventsLoaded=setInterval(()=>{
-        let calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=3; //more than three asgmts on calendar indicating asgmts loaded
+        const calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=1; //asgmts on calendar indicating asgmts loaded
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
             console.log('3. Add checkmarks');
