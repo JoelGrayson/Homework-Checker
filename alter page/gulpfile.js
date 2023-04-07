@@ -42,9 +42,9 @@ function runCmd(script) { //returns anonymous function that returns a promise ru
                 const exec=require('child_process').exec;
                 exec(script, (e, stdout, stderr)=>{
                     if (stderr)
-                        console.log(stderr);
+                        console.log('<hw>', stderr);
                     if (e)
-                        console.log(e);
+                        console.log('<hw>', e);
 
                     resolve(stdout);
                 });

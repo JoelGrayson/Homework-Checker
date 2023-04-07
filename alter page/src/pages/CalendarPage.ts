@@ -90,7 +90,7 @@ export default class CalendarPage extends SchoologyPage {
         const newState=forcedState ?? pHighlight==null; //if user forced state, override newHighlight
 
         if (newState) { //no highlight green already
-            console.log(`Checking ${asgmtText}`);
+            console.log('<hw>', `Checking ${asgmtText}`);
             //Check
             checkmarkEl.checked=true;
             const highlightGreenEl=this.createGreenHighlightEl({pageType: this.pageType, animate});
@@ -99,7 +99,7 @@ export default class CalendarPage extends SchoologyPage {
             if (storeInChrome)
                 this.addAsgmt(courseName, asgmtText, {createCourseIfNotExist: true });
         } else {
-            console.log(`Unchecking ${asgmtText}`);
+            console.log('<hw>', `Unchecking ${asgmtText}`);
             //Uncheck
             checkmarkEl.checked=false;
             asgmtEl.removeChild(pHighlight);

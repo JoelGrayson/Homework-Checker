@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener(()=>{
     function inspectData() {
         setInterval(()=>{ //see data
             chrome.storage.sync.get(null, (data)=>{
-                console.log(data);
+                console.log('<hw>', data);
             })
         }, 3000);
     }
@@ -23,11 +23,11 @@ chrome.runtime.onInstalled.addListener(()=>{
 
 //also onMessage in SchoologyPage.js
 chrome.runtime.onMessage.addListener((message, sender, sendRes)=>{
-    console.log({message, sender})
+    console.log('<hw>', {message, sender})
     const data=JSON.parse(message.data);
     if (message.run==='update chrome storage') {
         chrome.storage.sync.set(data, ()=>{
-            console.log('Updated successfully key-value:', data);
+            console.log('<hw>', 'Updated successfully key-value:', data);
             return true;
         });
     }
@@ -36,7 +36,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendRes)=>{
 
 
 chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and let know updated
-    console.log({details});
+    console.log('<hw>', {details});
     chrome.tabs.create({ //create new tab
         url: 'onboarding/updated.html'
     });

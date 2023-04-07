@@ -16,7 +16,7 @@ function executeAfterDoneLoading(
     let intervalID=setInterval(()=>{
         if (isLoading()) {
             // Continue waiting
-            console.log('Loading...')
+            console.log('<hw>', 'Loading...')
         } else {
             clearInterval(intervalID); //stop interval
             
@@ -29,7 +29,7 @@ function executeAfterDoneLoading(
 
 function determineSchoologyPageType(): void { //checks if page is a schoology calendar page before calling next
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
-    // console.log('1. Extension running');
+    // console.log('<hw>', '1. Extension running');
     //Calendar
     const hasSchoologyScripts=document.querySelectorAll(`script[src*='schoology.com']`); //schoology page
     
@@ -51,8 +51,9 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
             } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
                 executeAfterDoneLoading(()=>{
                     new HomePage({containerSelectors: [
-                        'div.upcoming-events-wrapper>div.upcoming-list', //upcoming asgmts
-                        'div.overdue-submissions-wrapper>div.upcoming-list', //overdue asgmts
+                                 '#overdue-submissions>div.upcoming-list', //overdue asgmts
+                        '.upcoming-submissions-wrapper>div.upcoming-list', //upcoming asgmts
+                                     '#upcoming-events>div.upcoming-list', //upcoming events
                     ]});
                 }, ()=>!document.querySelector('div.overdue-submissions-wrapper>div.upcoming-list')); //check if upcoming list exists, not if loading icon does not exist
             } else { //Non-schoology-related page
@@ -70,11 +71,11 @@ function waitForEventsLoaded(): void { //waits for calendar's events to load bef
         const calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=1; //asgmts on calendar indicating asgmts loaded
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
-            console.log('3. Add checkmarks');
+            console.log('<hw>', '3. Add checkmarks');
             // SchoologyCalendarPage();
             new CalendarPage();
         } else {
-            console.log('Still waiting for calendar events to load');
+            console.log('<hw>', 'Still waiting for calendar events to load');
         }
     }, 200);
 }
@@ -88,7 +89,7 @@ function waitForEventsLoaded(): void { //waits for calendar's events to load bef
 //     verbose: true //whether or not to show console messages
 // }
 // 
-// <Modify console.log() and console.error()
+// <Modify console.log('<hw>', ) and console.error()
 // let ogConsoleLog=console.log;
 // console.log=(...args)=>{
 //     if (homeworkCheckerSchoologyConfig.verbose)

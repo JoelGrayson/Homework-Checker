@@ -23,14 +23,14 @@ export default class HomePage extends SchoologyPage {
             this.addCheckmarks({
                 asgmtElContainer: document.querySelector(containerSelector),
                 customMiddleScript: (checkEl, asgmtEl)=>{
-                    if (asgmtEl.classList.contains('date-header'))
-                        return 'continue';
-                    else { //valid assignmment
-                        let jCheckContainer=document.createElement('span');
-                        jCheckContainer.classList.add(containerClass);
-                        let parentNode=asgmtEl.querySelector(selector);
-                        parentNode.insertBefore(jCheckContainer, parentNode.querySelector('span.upcoming-time'));
-                    }
+                    if (asgmtEl.classList.contains('date-header')) return 'continue';
+                    // Valid assignmment
+                    let jCheckContainer=document.createElement('span');
+                    jCheckContainer.classList.add(containerClass);
+                    let parentNode=asgmtEl.querySelector(selector);
+                    // ERROR: parentNode is none
+                    console.log('<hw>', {parentNode});
+                    parentNode.insertBefore(jCheckContainer, parentNode.querySelector('span.upcoming-time'));
                 },
                 locateElToAppendCheckmarkTo: el=>el.querySelector(`${selector} span.${containerClass}`),
             });
@@ -42,6 +42,7 @@ export default class HomePage extends SchoologyPage {
                 new HomePage({containerSelectors}); //revive checkmarks
         }, 300);
     }
+
     j_check({
         asgmtEl,
         forcedState=null,
@@ -50,7 +51,7 @@ export default class HomePage extends SchoologyPage {
             animate=false //shows animation when checking
         }
     }) {
-        console.log({asgmtEl})
+        console.log('<hw>', {asgmtEl});
         const pHighlight=!!asgmtEl.querySelector('.highlight-green'); //based on classList of asgmtEl
         const newState=forcedState ?? !pHighlight; //opposite when checking
 
@@ -62,7 +63,7 @@ export default class HomePage extends SchoologyPage {
             // differs from courseName on calendar, so use space-less version for comparison
 
         if (newState) { //check
-            console.log(`Checking '${asgmtText}'`);
+            console.log('<hw>', `Checking '${asgmtText}'`);
 
             checkmarkEl.checked=true;
             const highlightGreenEl=this.createGreenHighlightEl({pageType: this.pageType, animate});
@@ -73,7 +74,7 @@ export default class HomePage extends SchoologyPage {
             if (storeInChrome)
                 this.addAsgmt(courseName, asgmtText, {createCourseIfNotExist: true});
         } else { //uncheck
-            console.log(`Unchecking '${asgmtText}'`);
+            console.log('<hw>', `Unchecking '${asgmtText}'`);
             checkmarkEl.checked=false;
             const toRemove=asgmtEl.querySelector('.highlight-green');
             toRemove.parentNode.removeChild(toRemove);

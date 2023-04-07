@@ -51,10 +51,10 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
         const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
         const asgmtText=asgmtEl.querySelector('a').innerText;
         
-        console.log({newHighlight: newState, pHighlight, checkmarkEl});
+        console.log('<hw>', {newHighlight: newState, pHighlight, checkmarkEl});
 
         if (newState) { //no highlight green already, so check
-            console.log(`Checking ${asgmtText}`);
+            console.log('<hw>', `Checking ${asgmtText}`);
             //Check
             checkmarkEl.checked=true;
             const highlightGreenEl=this.createGreenHighlightEl({pageType: this.pageType, animate});
@@ -65,7 +65,7 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
             if (storeInChrome)
                 this.addAsgmt(this.courseName, asgmtText, {createCourseIfNotExist: true });
         } else { //uncheck
-            console.log(`Unchecking ${asgmtText}`);
+            console.log('<hw>', `Unchecking ${asgmtText}`);
             checkmarkEl.checked=false;
             const toRemove=asgmtEl.querySelector('.highlight-green');
             toRemove.parentNode.removeChild(toRemove);            

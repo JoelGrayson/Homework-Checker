@@ -33,11 +33,11 @@ export default abstract class SchoologyPage {
     coursesGlobal: Course[];
 
     constructor({ pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts=true, multipleAsgmtContainers=false }: PageOptions) {
-        console.log({pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts, multipleAsgmtContainers})
+        console.log('<hw>', {pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts, multipleAsgmtContainers})
         
         chrome.storage.sync.get('settings', ({settings})=>{ //settings change appearance
             if (settings.showCheckmarks==='onHover') {
-                console.log('Only show checkmark on hover');
+                console.log('<hw>', 'Only show checkmark on hover');
                 
                 //Load style if onlyShowCheckmarkOnHover
                 let styleEl=document.createElement('style');
@@ -87,8 +87,8 @@ export default abstract class SchoologyPage {
         //Sets this.coursesGlobal to chrome storage
         chrome.storage.sync.get('courses', ({courses})=>{
             this.coursesGlobal=courses;
-            console.log('courses', courses);
-            console.log(limits); //time & course limits when getting asgmts
+            console.log('<hw>', 'courses', courses);
+            console.log('<hw>', limits); //time & course limits when getting asgmts
             
             if (limits.courses==='$all' && limits.time==='any') { //calendar or home page
                 for (let course of courses) { //TODO: change schema
@@ -108,12 +108,12 @@ export default abstract class SchoologyPage {
 
             } else if (limits.courses!=='$all' && limits.time==='any') { //course page (all asgmts of course)
                 const courseName=limits.courses; //single course string
-                console.log(`Only checking asgmts of the course: ${courseName}`);
+                console.log('<hw>', `Only checking asgmts of the course: ${courseName}`);
                 const course=this.getCourse(courseName); //if course is undefined, it has not been created yet because there are no checked tasks
-                console.log('m1', {course})
+                console.log('<hw>', 'm1', {course})
                 if (course!=undefined) { //if the course exists
                     for (let asgmt of course.checked) {
-                        console.log('m2', {asgmt});
+                        console.log('<hw>', 'm2', {asgmt});
                         const [infoEl, blockEl]=this.getAsgmtByName(asgmt);
                         if (infoEl!=='No matches' && blockEl!=='No matches')
                             this.j_check({
@@ -143,7 +143,7 @@ export default abstract class SchoologyPage {
         return this.coursesGlobal.find(course=>course.name===name);
     }
     createCourse(course: string, options={save: true}) {
-        console.log('Creating course', course)
+        console.log('<hw>', 'Creating course', course)
         this.coursesGlobal.push({
             name: course,
             noSpacesName: removeSpaces(course),
@@ -176,7 +176,7 @@ export default abstract class SchoologyPage {
             this.createCourse(course, { save: false });
         
 
-        console.log({noSpacesName: options.noSpacesName});
+        console.log('<hw>', {noSpacesName: options.noSpacesName});
         this.getCourse(course, {noSpacesName: options.noSpacesName}).checked.push(asgmt);
         this.updateCourses();
     }
@@ -244,7 +244,7 @@ export default abstract class SchoologyPage {
     getAsgmtByName(asgmtName): Assignment { //returns DOMElement based on given string
         let query, queryRes;
 
-        console.log(asgmtName, this.multipleAsgmtContainers)
+        console.log('<hw>', asgmtName, this.multipleAsgmtContainers)
         
         if (this.multipleAsgmtContainers) { //multiple asgmt containers to check
             for (let getAsgmtByNamePathEl of this.getAsgmtByNamePathEl) { 

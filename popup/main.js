@@ -21,7 +21,7 @@ const showCheckmarksValues={ //enum of valid values
     }
     
     overdueCollapsed.checked=data.settings.overdueCollapsed;
-    console.log(data.settings.overdueCollapsed)
+    console.log('<hw>', data.settings.overdueCollapsed)
 
 })();
 
