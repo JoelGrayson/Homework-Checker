@@ -1,25 +1,25 @@
 export default function collapseOverdue() { //sets up
-    const overdueWrapperPath=`div.overdue-submissions-wrapper`;
+    const overdueWrapperPath=`div.overdue-submission`;
 
-    let intervalId=setInterval(()=>{
-        let ready=!!document.querySelector('div.overdue-submissions-wrapper>div.upcoming-list');
+    const intervalId=setInterval(()=>{
+        const ready=!!document.querySelector('div.overdue-submission>div.upcoming-list');
         if (ready) {
             init();
             clearInterval(intervalId);
         }
-    })
+    });
 
     async function init() {
         function get() {
             return new Promise((resolve, reject) => {
                 chrome.storage.sync.get('settings', ({settings})=>{
                     resolve(settings.overdueCollapsed);
-                })
-            })
+                });
+            });
         }
         async function set(newVal) {
-            let oldSettings: any=await get();
-            let newSettings={...oldSettings};
+            const oldSettings: any=await get();
+            const newSettings={...oldSettings};
             newSettings.overdueCollapsed=newVal;
             chrome.storage.sync.set({
                 settings: newSettings
@@ -28,7 +28,7 @@ export default function collapseOverdue() { //sets up
     
         const initialVal=await get();
     
-        const container=document.querySelector(overdueWrapperPath+'>h3') as HTMLHeadingElement;
+        const container=document.querySelector(overdueWrapperPath+'>h4') as HTMLHeadingElement;
         const collapseBtn=document.createElement('button');
             collapseBtn.style.marginLeft='4rem'; //distance between text
             collapseBtn.innerText='Hide Overdue Assignments';

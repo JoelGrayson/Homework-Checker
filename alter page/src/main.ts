@@ -49,13 +49,7 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
                     new CoursePage(courseId);
                 })
             } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
-                executeAfterDoneLoading(()=>{
-                    new HomePage({containerSelectors: [
-                                 '#overdue-submissions>div.upcoming-list', //overdue asgmts
-                        '.upcoming-submissions-wrapper>div.upcoming-list', //upcoming asgmts
-                                     '#upcoming-events>div.upcoming-list', //upcoming events
-                    ]});
-                }, ()=>!document.querySelector('div.overdue-submissions-wrapper>div.upcoming-list')); //check if upcoming list exists, not if loading icon does not exist
+                executeAfterDoneLoading(()=>new HomePage, ()=>!document.querySelector('div.overdue-submissions-wrapper>div.upcoming-list')); //check if upcoming list exists, not if loading icon does not exist
             } else { //Non-schoology-related page
                 //pass
             }
@@ -73,7 +67,7 @@ function waitForEventsLoaded(): void { //waits for calendar's events to load bef
             clearInterval(checkIfEventsLoaded);
             console.log('<hw>', '3. Add checkmarks');
             // SchoologyCalendarPage();
-            new CalendarPage();
+            new CalendarPage;
         } else {
             console.log('<hw>', 'Still waiting for calendar events to load');
         }

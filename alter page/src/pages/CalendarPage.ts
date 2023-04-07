@@ -15,9 +15,7 @@ export default class CalendarPage extends SchoologyPage {
         this.addCheckmarks({
             asgmtElContainer: (document.querySelector('div.fc-event>div.fc-event-inner') as HTMLDivElement).parentNode!.parentNode,
             customMiddleScript: (checkEl, asgmtEl)=>{
-                jQuery(checkEl).on('click', e=>{ //prevent asgmt dialog from opening when clicking checkmark
-                    e.stopPropagation();
-                });
+                jQuery(checkEl).on('click', e=>e.stopPropagation()); //prevent asgmt dialog from opening when clicking checkmark
             },
             locateElToAppendCheckmarkTo: el=>el
         });
@@ -27,15 +25,15 @@ export default class CalendarPage extends SchoologyPage {
         //Revives when checkmarks disappear due to asgmts re-render (such as when window resized or added a personal asgmt)
         setInterval(()=>{
             if (!document.querySelector('.j_check_cal')) //checkmarks don't exist anymore
-                new CalendarPage(); //revive checkmarks
+                new CalendarPage; //revive checkmarks
                 //alternative: window.location.reload()
         }, 300);
     }
 
     checkAllAsgmts() {
         const elementsByDate=jQuery(`span[class*='day-']`);
-        for (let el of elementsByDate) {
-            let asgmtEl=el.parentNode!.parentNode!.parentNode!.parentNode!.parentNode!.parentNode as HTMLElement;
+        for (const el of elementsByDate) {
+            const asgmtEl=el.parentNode!.parentNode!.parentNode!.parentNode!.parentNode!.parentNode as HTMLElement;
             if (asgmtEl!=null)
                 this.j_check({
                     asgmtEl,
@@ -50,7 +48,7 @@ export default class CalendarPage extends SchoologyPage {
     checkAllAsgmtsBeforeToday() {
         const elementsByDate=jQuery(`span[class*='day-']`);
         const today=new Date().getDate();
-        for (let el of elementsByDate) {
+        for (const el of elementsByDate) {
             const dayOfEl=parseInt(el.className.slice(-2))
             const beforeToday=dayOfEl<today;
 

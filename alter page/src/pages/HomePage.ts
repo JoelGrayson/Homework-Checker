@@ -1,8 +1,14 @@
 import SchoologyPage from './SchoologyPage';
 import collapseOverdue from './collapseOverdue';
 
+const containerSelectors=[
+    '#overdue-submissions>div.upcoming-list', //overdue asgmts
+    '.upcoming-submissions-wrapper>div.upcoming-list', //upcoming asgmts
+    '#upcoming-events>div.upcoming-list', //upcoming events
+];
+
 export default class HomePage extends SchoologyPage {
-    constructor({containerSelectors}) { //array of selectors (overdue and upcoming)
+    constructor() { //array of selectors (overdue and upcoming)
         super({
             pageType: 'home',
             getAsgmtByNamePathEl: containerSelectors.map(s=>`${s}>div`), //gets div (asgmt) inside containerSelector
@@ -17,20 +23,22 @@ export default class HomePage extends SchoologyPage {
         if (!document.querySelector('.j_collapse-button')) //only add button if not already existing
             collapseOverdue();
 
-        for (let containerSelector of containerSelectors) {
-            let selector=`h4>span`;
-            let containerClass='j_check_container';
+        for (const containerSelector of containerSelectors) {
+            const selector=`h4>span`;
+            const containerClass='j_check_container';
             this.addCheckmarks({
                 asgmtElContainer: document.querySelector(containerSelector),
                 customMiddleScript: (checkEl, asgmtEl)=>{
                     if (asgmtEl.classList.contains('date-header')) return 'continue';
+                    
                     // Valid assignmment
-                    let jCheckContainer=document.createElement('span');
+                    const jCheckContainer=document.createElement('span');
                     jCheckContainer.classList.add(containerClass);
-                    let parentNode=asgmtEl.querySelector(selector);
-                    // ERROR: parentNode is none
-                    console.log('<hw>', {parentNode});
-                    parentNode.insertBefore(jCheckContainer, parentNode.querySelector('span.upcoming-time'));
+                    const parentNode=asgmtEl.querySelector(selector);
+                    if (parentNode) //sometimes, the selector selects non-assignments
+                        parentNode.insertBefore(jCheckContainer, parentNode.querySelector('span.upcoming-time'));
+                    else //tell SchoologyPage to skip this element
+                        return 'continue';
                 },
                 locateElToAppendCheckmarkTo: el=>el.querySelector(`${selector} span.${containerClass}`),
             });
@@ -39,7 +47,7 @@ export default class HomePage extends SchoologyPage {
         // Revives when checkmarks disappear or are not there. When loading, sometimes the DOM needs a while to add
         setInterval(()=>{
             if (!document.querySelector('.j_check_home')) //checkmarks don't exist anymore
-                new HomePage({containerSelectors}); //revive checkmarks
+                new HomePage; //revive checkmarks
         }, 300);
     }
 
