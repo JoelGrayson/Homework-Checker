@@ -2,9 +2,8 @@ import CalendarPage from './pages/CalendarPage';
 import HomePage from './pages/HomePage';
 import CoursePage from './pages/CoursePage';
 
-//This script is injected into every page.
-//Functions are in sequential order
-
+// This script is injected into every page.
+// Functions are in sequential order
 
 window.addEventListener('load', determineSchoologyPageType, false); //wait for DOM elements to load
 
@@ -42,7 +41,7 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
 
         //Not calendar
         else {
-            let hasCourse=window.location.pathname.match(/\/course\/(\d+)\//);
+            const hasCourse=window.location.pathname.match(/\/course\/(\d+)\//);
             if (hasCourse) { //type 2: course materials page
                 let courseId=hasCourse[1];
                 executeAfterDoneLoading(()=>{
@@ -61,37 +60,14 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
 //<h1> CALENDAR
 //Resize event listener
 function waitForEventsLoaded(): void { //waits for calendar's events to load before calling next
-    let checkIfEventsLoaded=setInterval(()=>{
+    const checkIfEventsLoaded=setInterval(()=>{
         const calendarEventsLoaded=jQuery('#fcalendar>div.fc-content>div.fc-view>div')[0].children.length>=1; //asgmts on calendar indicating asgmts loaded
         if (calendarEventsLoaded) {
             clearInterval(checkIfEventsLoaded);
             console.log('<hw>', '3. Add checkmarks');
-            // SchoologyCalendarPage();
             new CalendarPage;
         } else {
             console.log('<hw>', 'Still waiting for calendar events to load');
         }
     }, 200);
 }
-
-
-
-
-
-// * CONFIG
-// const homeworkCheckerSchoologyConfig={
-//     verbose: true //whether or not to show console messages
-// }
-// 
-// <Modify console.log('<hw>', ) and console.error()
-// let ogConsoleLog=console.log;
-// console.log=(...args)=>{
-//     if (homeworkCheckerSchoologyConfig.verbose)
-//         ogConsoleLog(`ⓢ`, ...args);
-// };
-// let ogConsoleError=console.error;
-// console.error=(...args)=>{
-//     if (homeworkCheckerSchoologyConfig.verbose)
-//     ogConsoleError(`ⓢ`, ...args);
-// };
-// />

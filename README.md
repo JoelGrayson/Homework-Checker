@@ -1,11 +1,11 @@
 # Homework Checker (Schoology)
-Keep track of your complete/incomplete Schoology assignments with this chrome extension. It's motivating and helps you organize.
+Keep track of your complete/incomplete Schoology assignments with this chrome extension. It's motivating and helps you organize. Learn more at [joelgrayson.com/software/homework-checker](https://joelgrayson.com/software/homework-checker)
 
-
-\
 Add on the chrome web store: https://chrome.google.com/webstore/detail/homework-checker-schoolog/aflepcmbhmafadnddmdippaajhjnmohj
 
-<img src='https://i.ibb.co/vx9YQqg/Screen-Shot-2022-01-10-at-7-23-51-PM.png' width='50px'/>
+<a href='https://chrome.google.com/webstore/detail/homework-checker-schoolog/aflepcmbhmafadnddmdippaajhjnmohj' target='_blank'>
+    <img src='https://i.ibb.co/vx9YQqg/Screen-Shot-2022-01-10-at-7-23-51-PM.png' width='50px'/>
+</a>
 
 
 
