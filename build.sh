@@ -18,8 +18,8 @@ rm -rf "$FINAL_DEST"
 rm -rf './build'
 
 mkdir './build'
-mkdir $TEMP_DEST #fresh empty outer directory
-mkdir "$FINAL_DEST"
+mkdir "$TEMP_DEST" #fresh empty outer directory
+mkdir -p "$FINAL_DEST"
 
 #* || Copying Files
 for file in $(ls -p | grep -v /) #list only files in this directory
@@ -45,15 +45,21 @@ rm -rf "$TEMP_DEST/alter page/node_modules" "$TEMP_DEST/build"
 rm "$TEMP_DEST/alter page/gulpfile.js" "$TEMP_DEST/alter page/package-lock.json" "$TEMP_DEST/alter page/package.json" "$TEMP_DEST/alter page/tsconfig.json" "$TEMP_DEST/alter page/webpack.config.js"
 
 mv "$TEMP_DEST" "$FINAL_DEST"
+echo "Build Complete"
 
-echo "✅ Build Complete"
-# echo "Compressing..."
-# tar -czf "$name.tgz" "$FINAL_DEST"
-# echo "✅ Compressing complete"
-# mkdir "$FINAL_DEST/Unzipped Form"
-# mv "$FINAL_DEST"/* "$FINAL_DEST/Unzipped Form"
-# mv "$FINAL_DEST/Unzipped Form/$name.tar.gz" "$FINAL_DEST/"
-# mv "$name.tgz" "$FINAL_DEST"
+
+echo "Compressing..."
+(
+    cd "$FINAL_DEST"
+    rm -rf "$name"
+    mv "build" "$name"
+    zip -r "$name.zip" "$name"
+    mv "$name" "unzipped"
+    mv * ..
+    cd ..
+)
+echo "✅ Compressing complete"
+
 open "$FINAL_DEST/.."
 
 echo 'display notification "Ready to upload zipped extension to web store" with title "Build.sh"' | osascript
