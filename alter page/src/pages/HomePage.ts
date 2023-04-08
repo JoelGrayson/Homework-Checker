@@ -1,5 +1,6 @@
 import SchoologyPage from './SchoologyPage';
-import collapseOverdue from './collapseOverdue';
+import hideOverdue from './hide-buttons/hideOverdue';
+import hideRecentlyCompleted from './hide-buttons/hideRecentlyCompleted';
 
 const containerSelectors=[
     '#overdue-submissions>div.upcoming-list', //overdue asgmts
@@ -20,8 +21,10 @@ export default class HomePage extends SchoologyPage {
             multipleAsgmtContainers: true
         });
 
-        if (!document.querySelector('.j_collapse-button')) //only add button if not already existing
-            collapseOverdue();
+        if (!document.querySelector('.j_collapse-button')) { //only add button if not already existing
+            hideOverdue();
+            hideRecentlyCompleted();
+        }
 
         for (const containerSelector of containerSelectors) {
             const selector=`h4>span`;

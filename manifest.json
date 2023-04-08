@@ -17,7 +17,7 @@
             ],
             "css": [
                 "alter page/dist/injected/checkmark.css",
-                "alter page/dist/injected/style.css"
+                "alter page/dist/injected/hide-button.css"
             ],
             "run_at": "document_end"
         }

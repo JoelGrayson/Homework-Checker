@@ -5,7 +5,8 @@ chrome.runtime.onInstalled.addListener(()=>{
         settings: {
             showCheckmarks: 'always', //'onHover' | 'always'
             betaEnabled: false, //shows beta features
-            overdueCollapsed: false, //when true, overdue section is collapsed
+            overdueHidden: false, //when true, overdue assignments list is collapsed
+            recentlyCompletedHidden: false
         },
         courses: [] //array of courses with checked asgmts
     });
