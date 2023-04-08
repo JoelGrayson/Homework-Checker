@@ -1,8 +1,8 @@
 export default function collapseOverdue() { //sets up
-    const overdueWrapperPath=`div.overdue-submission`;
+    const overduePath='#overdue-submissions';
 
     const intervalId=setInterval(()=>{
-        const ready=!!document.querySelector('div.overdue-submission>div.upcoming-list');
+        const ready=!!document.querySelector(`${overduePath}>.upcoming-list`);
         if (ready) {
             init();
             clearInterval(intervalId);
@@ -28,9 +28,9 @@ export default function collapseOverdue() { //sets up
     
         const initialVal=await get();
     
-        const container=document.querySelector(overdueWrapperPath+'>h4') as HTMLHeadingElement;
+        const container=document.querySelector(overduePath+'>h4') as HTMLHeadingElement;
         const collapseBtn=document.createElement('button');
-            collapseBtn.style.marginLeft='4rem'; //distance between text
+            collapseBtn.style.marginLeft='2rem'; //distance between text
             collapseBtn.innerText='Hide Overdue Assignments';
             collapseBtn.classList.add('j_button');
             collapseBtn.classList.add('j_collapse-button');
@@ -44,9 +44,9 @@ export default function collapseOverdue() { //sets up
         rerenderCollapseBtn(initialVal); //initial call
     
         function rerenderCollapseBtn(newVal) {
-            const asgmtsEl=document.querySelector(overdueWrapperPath+'>div.upcoming-list');
+            const asgmtsEl=document.querySelector(overduePath+'>div.upcoming-list');
             asgmtsEl.classList.toggle('j_collapsed', newVal); //class if newVal
-            collapseBtn.innerText=newVal?'Show Overdue Assignments':'Hide Overdue Assignments';
+            collapseBtn.innerText=newVal ? 'Show':'Hide';
         }
     }
 }
