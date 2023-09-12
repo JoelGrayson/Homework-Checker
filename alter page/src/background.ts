@@ -36,13 +36,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendRes)=>{
 });
 
 
-chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and let know updated
-    console.log('<hw>', {details});
-    chrome.tabs.create({ //create new tab
-        url: 'onboarding/updated.html'
-    });
-    chrome.runtime.reload();
-});
+// chrome.runtime.onUpdateAvailable.addListener(details=>{ //update extension and let know updated
+//     console.log('<hw>', {details});
+//     chrome.tabs.create({ //create new tab
+//         url: 'onboarding/updated.html'
+//     });
+//     chrome.runtime.reload();
+// });
 
 
 /*

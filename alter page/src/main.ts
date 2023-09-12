@@ -47,8 +47,8 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
                 executeAfterDoneLoading(()=>{
                     new CoursePage(courseId);
                 })
-            } else if (window.location.pathname.includes('home')) { //type 3: schoology home page
-                executeAfterDoneLoading(()=>new HomePage, ()=>!document.querySelector('div.overdue-submissions-wrapper>div.upcoming-list')); //check if upcoming list exists, not if loading icon does not exist
+            } else if (window.location.pathname.includes('home') || document.getElementById('right-column-inner')) { //type 3: schoology home page
+                executeAfterDoneLoading(()=>new HomePage, ()=>!document.querySelector('upcoming-event'/* this caused problems in bug report: 'div.overdue-submissions-wrapper>div.upcoming-list'*/)); //check if upcoming list exists, not if loading icon does not exist
             } else { //Non-schoology-related page
                 //pass
             }
