@@ -1,15 +1,35 @@
 /// <reference types="chrome"/>
 
+const VERSION='6.1';
+
 chrome.runtime.onInstalled.addListener(()=>{
-    chrome.storage.sync.set({
-        settings: {
-            showCheckmarks: 'always', //'onHover' | 'always'
-            betaEnabled: false, //shows beta features
-            overdueHidden: false, //when true, overdue assignments list is collapsed
-            recentlyCompletedHidden: false
-        },
-        courses: [] //array of courses with checked asgmts
-    });
+    chrome.storage.sync.get('settings')
+        .then(({ settings })=>{
+            const defaultSettings={
+                showCheckmarks: 'always', //'onHover' | 'always'
+                betaEnabled: false, //shows beta features
+                overdueHidden: false, //when true, overdue assignments list is collapsed
+                recentlyCompletedHidden: false
+            };
+
+            for (const key in defaultSettings) //set 
+                if (settings[key]===undefined)
+                    settings[key]=defaultSettings[key];
+
+            chrome.storage.sync.set({
+                version: VERSION, //for debugging and backwards compatibility perhaps in the future
+                settings
+            });
+        });
+    
+    chrome.storage.sync.get('courses')
+        .then(({ courses })=>{
+            if (!Array.isArray(courses)) {
+                chrome.storage.sync.set({
+                    courses: []
+                });
+            }
+        });
 
     inspectData();
 

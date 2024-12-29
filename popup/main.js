@@ -50,9 +50,7 @@ overdueCollapsed.addEventListener('change', async ()=>{
 
 //Uncheck All Assignments (reset) Button
 document.getElementById('resetBtn').addEventListener('click', async e=>{
-    let data=await chrome.storage.sync.get(); //current settings
-    data.courses={}; //makes courses empty but keeps settings
-    chrome.storage.sync.set(data);
+    chrome.storage.sync.set({courses: []});
     sendMessage({run: 'reload'}); //reload page for changes to show
 });
 
