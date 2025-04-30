@@ -1,0 +1,28 @@
+body {
+    width: 440px;
+    height: 100%;
+    line-height: 1.6;
+    border: 1px solid rgb(69, 112, 255);
+    padding: 5px 25px;
+    padding-bottom: 20px;
+}
+body * {
+    padding: 3px;
+}
+
+h1 {
+    text-align: center;
+}
+
+label {
+    word-wrap: break-word;
+}
+
+
+.custom-switch .custom-control-label::before {
+    /* position: relative; */
+    top: 7px;
+}
+.custom-switch .custom-control-label::after { /* move switch down */
+    top: calc(.25rem + 2px + 3px);
+}

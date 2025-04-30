@@ -1,0 +1,49 @@
+{
+    "name": "Homework Checker (Schoology)",
+    "description": "Stay organized. Check off assignments like a todo-list.",
+    "author": "Joel Grayson",
+
+    "version": "6.2",
+    "manifest_version": 3,
+    "background": {
+        "scripts": ["alter page/dist/background.js"]
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": [
+                "alter page/dist/injected/jquery.min.js",
+                "alter page/dist/content script bundle.js"
+            ],
+            "css": [
+                "alter page/dist/injected/checkmark.css",
+                "alter page/dist/injected/hide-button.css"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "host_permissions": ["<all_urls>"],
+    "permissions": ["storage"],
+    
+    "action": {
+        "default_popup": "popup/index.html",
+        "default_icon": {
+            "16": "icons/logo-16.png",
+            "32": "icons/logo-32.png",
+            "48": "icons/logo-48.png",
+            "128": "icons/logo-128.png"
+        }
+    },
+    "icons": {
+        "16": "icons/logo-16.png",
+        "32": "icons/logo-32.png",
+        "48": "icons/logo-48.png",
+        "128": "icons/logo-128.png"
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "homeworkchecker@joelgrayson.com",
+            "strict_min_version": "109.0"
+        }
+    }
+}
