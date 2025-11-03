@@ -108,7 +108,7 @@ export default abstract class SchoologyPage {
         chrome.storage.sync.get('courses', ({courses})=>{
             this.coursesGlobal=courses;
             console.log('<hw>', 'courses', courses);
-            console.log('<hw>', limits); //time & course limits when getting asgmts
+            console.log('<hw>', 'limits', limits); //time & course limits when getting asgmts
             
             if (limits.courses==='$all' && limits.time==='any') { //calendar or home page
                 for (let course of courses) { //TODO: change schema

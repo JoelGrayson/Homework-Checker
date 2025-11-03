@@ -61,6 +61,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
                         version
                     })
                 );
+
+                document.getElementById('copyMessage').classList.add('hidden');
+                document.getElementById('copiedMessage').classList.remove('hidden');
+                setTimeout(()=>{
+                    document.getElementById('copyMessage').classList.remove('hidden');
+                    document.getElementById('copiedMessage').classList.add('hidden');
+                }, 3000);
             });
     }
 });

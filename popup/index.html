@@ -68,9 +68,19 @@
                 </button>
             </a>
 
-            <u style='color: blue; font-size: 14px; cursor: pointer;' id='copyDebugInfo'>
-                Copy Debug Information
-            </u>
+            <style>
+                .hidden {
+                    display: none;
+                }
+            </style>
+            <span id='copyDebugInfo'>
+                <u style='color: blue; font-size: 14px; cursor: pointer;' id='copyMessage'>
+                    Copy Debug Information
+                </u>
+                <u style='color: green; font-size: 14px; cursor: pointer;' class='hidden' id='copiedMessage'>
+                    ✅ Copied
+                </u>
+            </span>
         </div>
     </div>
 

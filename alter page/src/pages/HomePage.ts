@@ -2,10 +2,14 @@ import SchoologyPage from './SchoologyPage';
 import hideOverdue from './hide-buttons/hideOverdue';
 import hideRecentlyCompleted from './hide-buttons/hideRecentlyCompleted';
 
+// There are assignments and events
 const containerSelectors=[
-    '#overdue-submissions>div.upcoming-list', //overdue asgmts
-    '.upcoming-submissions-wrapper>div.upcoming-list', //upcoming asgmts
-    '#upcoming-events>div.upcoming-list', //upcoming events
+    // Assignments
+    '#overdue-submissions>.upcoming-list', //overdue asgmts
+    '.upcoming-submissions-wrapper>.upcoming-list', //upcoming asgmts
+    
+    // Events
+    '#upcoming-events>.upcoming-list', //upcoming events
 ];
 
 export default class HomePage extends SchoologyPage {
@@ -63,7 +67,11 @@ export default class HomePage extends SchoologyPage {
         }
     }) {
         console.log('<hw>', {asgmtEl});
-        const pHighlight=!!asgmtEl.querySelector('.highlight-green'); //based on classList of asgmtEl
+        if (!asgmtEl) {
+            console.log('asgmtEl undefined so skipping');
+            return;
+        }
+        const pHighlight=!!(asgmtEl.querySelector('.highlight-green')); //based on classList of asgmtEl
         const newState=forcedState ?? !pHighlight; //opposite when checking
 
         const checkmarkEl=asgmtEl.querySelector(`input.j_check_${this.pageType}`);
