@@ -20,7 +20,6 @@ function executeAfterDoneLoading(
             clearInterval(intervalID); //stop interval
             
             setTimeout(()=>{ //wait another .01 seconds for asgmtEls to render on DOM
-                console.log('calling callback finally');
                 callback();
             }, 10)
         }
@@ -33,8 +32,6 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
     //Calendar
     const hasSchoologyScripts=document.querySelectorAll(`link[href*='schoology.com']`); //schoology page
         // such as <link rel="shortcut icon" href="https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/favicon.ico" type="image/x-icon">
-    console.log('hi from det', hasSchoologyScripts);
-    
     if (hasSchoologyScripts && hasSchoologyScripts.length>0) { //schoology page (determine which one)
         console.log('<hw> This is a schoology page');
         

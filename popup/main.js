@@ -42,6 +42,30 @@ overdueCollapsed.addEventListener('change', async ()=>{
     sendMessage({run: 'reload'}); //reloads when checking
 });
 
+
+
+document.getElementById('copyDebugInfo').addEventListener('click', async ()=>{
+    sendMessage({run: 'copy debug info'}); //reloads when checking
+});
+chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
+    console.log('popup message', request);
+    if (typeof request === 'object' && request?.type === 'debug-info') {
+        chrome.storage.sync.get('settings')
+            .then(({ settings })=>{
+                const version = settings.version;
+                console.log('Version', version, 'settings', settings);
+
+                navigator.clipboard.writeText(
+                    JSON.stringify({
+                        ...request,
+                        version
+                    })
+                );
+            });
+    }
+});
+
+
 //*|| Button EventListeners
 //Check all asgmts
 // document.getElementById('checkAll').addEventListener('click', ()=>{

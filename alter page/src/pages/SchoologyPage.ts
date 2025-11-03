@@ -78,6 +78,26 @@ export default abstract class SchoologyPage {
                     case 'check all asgmts before today':
                         this.checkAllAsgmtsBeforeToday();
                         break;
+                    case 'copy debug info':
+                        let data = 'there is no data';
+                        console.log('Getting debug info for pageType', pageType);
+                        switch (pageType) {
+                            case 'cal':
+                                data = document.getElementById('fcalendar').innerHTML;
+                                break;
+                            case 'home':
+                            case 'course':
+                                data = document.getElementById('right-column').innerHTML;
+                                break;
+                            default:
+                                data = `Unknown page type: ${pageType}`;
+                        }
+
+                        chrome.runtime.sendMessage({
+                            type: 'debug-info',
+                            data
+                        });
+                        break;
                     default:
                         console.error('Unknown run message:', msg.run)
                 }

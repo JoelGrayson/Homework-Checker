@@ -1,6 +1,6 @@
 /// <reference types="chrome"/>
 
-const VERSION='6.1';
+const VERSION='6.ELIJAH';
 
 chrome.runtime.onInstalled.addListener(()=>{
     chrome.storage.sync.get('settings')
@@ -48,8 +48,8 @@ chrome.runtime.onInstalled.addListener(()=>{
 //also onMessage in SchoologyPage.js
 chrome.runtime.onMessage.addListener((message, sender, sendRes)=>{
     console.log('<hw>', {message, sender})
-    const data=JSON.parse(message.data);
     if (message.run==='update chrome storage') {
+        const data=JSON.parse(message.data);
         chrome.storage.sync.set(data, ()=>{
             console.log('<hw>', 'Updated successfully key-value:', data);
             return true;
