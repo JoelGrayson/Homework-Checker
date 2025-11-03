@@ -237,7 +237,22 @@ export default abstract class SchoologyPage {
             if (toRun==='continue')
                 continue;
             
-            locateElToAppendCheckmarkTo(asgmtEl).appendChild(checkEl);
+            const appendEl = locateElToAppendCheckmarkTo(asgmtEl);
+            console.log({appendEl});
+            if (!appendEl) {
+                console.log('<hw> No appendEl');
+                return
+            }
+            if (appendEl.nodeType === 3) { //Text
+                // if (appendEl.innerText.includes('No upcoming assignments or events')) {
+                console.log('<hw> Includes no assignments because text');
+                const newItem = document.createElement('div');
+                newItem.className = `j_check_${this.pageType}`;
+                newItem.style.display = 'hidden';
+                document.body.appendChild(newItem); //so it stops reloading
+                return;
+            }
+            appendEl.appendChild(checkEl);
         }
     }
 

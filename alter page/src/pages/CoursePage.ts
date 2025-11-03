@@ -32,10 +32,17 @@ export default class CoursePage extends SchoologyPage { //materials page (one co
         });
 
         // Revives when checkmarks disappear or are not there. When loading, sometimes the DOM needs a while to add
-        setInterval(()=>{
-            if (!document.querySelector('.j_check_course')) //checkmarks don't exist anymore
-                new CoursePage(courseId); //revive checkmarks
-        }, 500);
+        // let attempts = 0;
+        // const intervalId = setInterval(()=>{
+        //     if (!document.querySelector('.j_check_course')) //checkmarks don't exist anymore
+        //         new CoursePage(courseId); //revive checkmarks
+            
+        //     attempts++;
+
+        //     if (attempts > 20) { //after 10 seconds of trying give up
+        //         clearInterval(intervalId);
+        //     }
+        // }, 500);
     }
     j_check({
         asgmtEl,

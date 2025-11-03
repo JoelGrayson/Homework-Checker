@@ -20,6 +20,7 @@ function executeAfterDoneLoading(
             clearInterval(intervalID); //stop interval
             
             setTimeout(()=>{ //wait another .01 seconds for asgmtEls to render on DOM
+                console.log('calling callback finally');
                 callback();
             }, 10)
         }
@@ -30,27 +31,35 @@ function determineSchoologyPageType(): void { //checks if page is a schoology ca
     jQuery.noConflict(); //schoology also has its own jQuery, so use `jQuery` instead of `$` to avoid conflict
     // console.log('<hw>', '1. Extension running');
     //Calendar
-    const hasSchoologyScripts=document.querySelectorAll(`script[src*='schoology.com']`); //schoology page
+    const hasSchoologyScripts=document.querySelectorAll(`link[href*='schoology.com']`); //schoology page
+        // such as <link rel="shortcut icon" href="https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/favicon.ico" type="image/x-icon">
+    console.log('hi from det', hasSchoologyScripts);
     
-    if (hasSchoologyScripts) { //schoology page (determine which one)
+    if (hasSchoologyScripts && hasSchoologyScripts.length>0) { //schoology page (determine which one)
+        console.log('<hw> This is a schoology page');
+        
         const hasCalendar=document.querySelector('#fcalendar'); //calendar page
         const urlHasCalendar=window.location.pathname.includes('calendar');
-        if (hasCalendar && urlHasCalendar) { //type 1: schoology calendar
+        console.log({hasCalendar, urlHasCalendar});
+        if (hasCalendar && urlHasCalendar) {
+            //type 1: schoology calendar
+            console.log('<hw>', 'Is calendar page');
             waitForEventsLoaded();
-        }
-
-        //Not calendar
-        else {
+        } else {
+            //Not calendar
             const hasCourse=window.location.pathname.match(/\/course\/(\d+)\//);
             if (hasCourse) { //type 2: course materials page
+                console.log('<hw>', 'Is course page');
                 let courseId=hasCourse[1];
                 executeAfterDoneLoading(()=>{
                     new CoursePage(courseId);
-                })
+                });
             } else if (window.location.pathname.includes('home') || document.getElementById('right-column-inner')) { //type 3: schoology home page
-                executeAfterDoneLoading(()=>new HomePage, ()=>!document.querySelector('upcoming-event'/* this caused problems in bug report: 'div.overdue-submissions-wrapper>div.upcoming-list'*/)); //check if upcoming list exists, not if loading icon does not exist
+                console.log('<hw>', 'Is home page');
+                executeAfterDoneLoading(()=>new HomePage, ()=>!document.querySelector('.upcoming-event'/* this caused problems in bug report: 'div.overdue-submissions-wrapper>div.upcoming-list'*/)); //check if upcoming list exists, not if loading icon does not exist
             } else { //Non-schoology-related page
                 //pass
+                console.log('<hw>', 'non-schoology-related page');
             }
         }
     }

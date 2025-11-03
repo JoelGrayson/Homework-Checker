@@ -12,6 +12,9 @@ chrome.runtime.onInstalled.addListener(()=>{
                 recentlyCompletedHidden: false
             };
 
+            if (settings === undefined)
+                settings = {};
+
             for (const key in defaultSettings) //set 
                 if (settings[key]===undefined)
                     settings[key]=defaultSettings[key];

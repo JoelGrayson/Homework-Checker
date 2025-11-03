@@ -60,6 +60,8 @@ echo "Compressing..."
 )
 echo "✅ Compressing complete"
 
-open "$FINAL_DEST/.."
+if [[ "$1" != "no-open" ]]; then
+    open "$FINAL_DEST/.."
+fi
 
 echo 'display notification "Ready to upload zipped extension to web store" with title "Build.sh"' | osascript
