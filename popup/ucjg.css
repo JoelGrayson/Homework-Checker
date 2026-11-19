@@ -6,6 +6,10 @@
     font-family: 'Lato';
 }
 
+h3 {
+    font-size: 1.5rem;
+}
+
 p {
     line-height: 1.7;
 }

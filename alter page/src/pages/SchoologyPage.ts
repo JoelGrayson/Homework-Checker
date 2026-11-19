@@ -93,9 +93,11 @@ export default abstract class SchoologyPage {
                                 data = `Unknown page type: ${pageType}`;
                         }
 
+                        const encodedData = window.btoa(data);
+                        
                         chrome.runtime.sendMessage({
                             type: 'debug-info',
-                            data
+                            data: encodedData
                         });
                         break;
                     default:

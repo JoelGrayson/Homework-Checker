@@ -6,9 +6,6 @@ body {
     padding: 5px 25px;
     padding-bottom: 20px;
 }
-body * {
-    padding: 3px;
-}
 
 h1 {
     text-align: center;

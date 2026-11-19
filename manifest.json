@@ -3,7 +3,8 @@
     "description": "Stay organized. Check off assignments like a todo-list.",
     "author": "Joel Grayson",
 
-    "version": "6.2",
+    "version": "6.3.1",
+    "version_name": "ELIJAH",
     "manifest_version": 3,
     "background": {
         "service_worker": "alter page/dist/background.js"

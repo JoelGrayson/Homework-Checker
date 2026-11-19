@@ -1,6 +1,6 @@
 /// <reference types="chrome"/>
 
-const VERSION='6.ELIJAH';
+const VERSION='6.3.1 (ELIJAH)';
 
 chrome.runtime.onInstalled.addListener(()=>{
     chrome.storage.sync.get('settings')
