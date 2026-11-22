@@ -2,7 +2,15 @@
 
 const VERSION='6.3.1 (ELIJAH)';
 
-chrome.runtime.onInstalled.addListener(()=>{
+chrome.runtime.onInstalled.addListener(async ()=>{
+    //one-time migration: data used to live in storage.sync (8 KB per-item cap). Copy it over before defaults fill in, or updating users lose every check
+    const local=await chrome.storage.local.get(['courses', 'settings']);
+    if (local.courses===undefined && local.settings===undefined) {
+        const synced=await chrome.storage.sync.get(['courses', 'settings']);
+        if (synced.courses!==undefined || synced.settings!==undefined)
+            await chrome.storage.local.set(synced);
+    }
+
     chrome.storage.local.get('settings')
         .then(({ settings })=>{
             const defaultSettings={
