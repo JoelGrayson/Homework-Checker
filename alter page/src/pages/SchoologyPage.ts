@@ -35,7 +35,7 @@ export default abstract class SchoologyPage {
     constructor({ pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts=true, multipleAsgmtContainers=false }: PageOptions) {
         console.log('<hw>', {pageType, getAsgmtByNamePathEl, infoToBlockEl, limits, ignoreOldAsgmts, multipleAsgmtContainers})
         
-        chrome.storage.sync.get('settings', ({settings})=>{ //settings change appearance
+        chrome.storage.local.get('settings', ({settings})=>{ //settings change appearance
             if (settings.showCheckmarks==='onHover') {
                 console.log('<hw>', 'Only show checkmark on hover');
                 
@@ -107,7 +107,7 @@ export default abstract class SchoologyPage {
             return true;
         });
         //Sets this.coursesGlobal to chrome storage
-        chrome.storage.sync.get('courses', ({courses})=>{
+        chrome.storage.local.get('courses', ({courses})=>{
             this.coursesGlobal=courses;
             console.log('<hw>', 'courses', courses);
             console.log('<hw>', 'limits', limits); //time & course limits when getting asgmts

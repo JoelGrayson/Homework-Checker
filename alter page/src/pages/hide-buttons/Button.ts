@@ -33,16 +33,16 @@ export default class HideButton {
 
     getCollapsedSetting() {
         return new Promise((resolve)=>{
-            chrome.storage.sync.get('settings', ({settings})=>{
+            chrome.storage.local.get('settings', ({settings})=>{
                 resolve(settings[this.settingsProperty]);
             });
         });
     }
 
     async setCollapsedSetting(newVal) {
-        const settings=await chrome.storage.sync.get('settings');
+        const settings=await chrome.storage.local.get('settings');
         settings[this.settingsProperty]=newVal;
-        chrome.storage.sync.set({ settings });
+        chrome.storage.local.set({ settings });
     }
     
     renderBtn() {

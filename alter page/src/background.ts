@@ -2,8 +2,16 @@
 
 const VERSION='6.3.1 (ELIJAH)';
 
-chrome.runtime.onInstalled.addListener(()=>{
-    chrome.storage.sync.get('settings')
+chrome.runtime.onInstalled.addListener(async ()=>{
+    //one-time migration: data used to live in storage.sync (8 KB per-item cap). Copy it over before defaults fill in, or updating users lose every check
+    const local=await chrome.storage.local.get(['courses', 'settings']);
+    if (local.courses===undefined && local.settings===undefined) {
+        const synced=await chrome.storage.sync.get(['courses', 'settings']);
+        if (synced.courses!==undefined || synced.settings!==undefined)
+            await chrome.storage.local.set(synced);
+    }
+
+    chrome.storage.local.get('settings')
         .then(({ settings })=>{
             const defaultSettings={
                 showCheckmarks: 'always', //'onHover' | 'always'
@@ -19,16 +27,16 @@ chrome.runtime.onInstalled.addListener(()=>{
                 if (settings[key]===undefined)
                     settings[key]=defaultSettings[key];
 
-            chrome.storage.sync.set({
+            chrome.storage.local.set({
                 version: VERSION, //for debugging and backwards compatibility perhaps in the future
                 settings
             });
         });
     
-    chrome.storage.sync.get('courses')
+    chrome.storage.local.get('courses')
         .then(({ courses })=>{
             if (!Array.isArray(courses)) {
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     courses: []
                 });
             }
@@ -38,7 +46,7 @@ chrome.runtime.onInstalled.addListener(()=>{
 
     function inspectData() {
         setInterval(()=>{ //see data
-            chrome.storage.sync.get(null, (data)=>{
+            chrome.storage.local.get(null, (data)=>{
                 console.log('<hw>', data);
             })
         }, 3000);
@@ -50,7 +58,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendRes)=>{
     console.log('<hw>', {message, sender})
     if (message.run==='update chrome storage') {
         const data=JSON.parse(message.data);
-        chrome.storage.sync.set(data, ()=>{
+        chrome.storage.local.set(data, ()=>{
+            if (chrome.runtime.lastError) { //was silently ignored; a failed save looked like a successful check until refresh
+                console.error('<hw>', 'Save failed:', chrome.runtime.lastError.message);
+                return;
+            }
             console.log('<hw>', 'Updated successfully key-value:', data);
             return true;
         });
