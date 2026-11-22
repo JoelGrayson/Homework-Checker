@@ -8,7 +8,7 @@ const showCheckmarksValues={ //enum of valid values
 
 //*|| Import data from chrome storage
 (async ()=>{ //Assigns switches the proper checked/unchecked values (fetches from chrome storage and reflects changes on switches on/off)
-    let data=await chrome.storage.sync.get();
+    let data=await chrome.storage.local.get();
     switch (data.settings.showCheckmarks) {
         case showCheckmarksValues.always:
             onlyShowOnHoverEl.checked=false;
@@ -27,17 +27,17 @@ const showCheckmarksValues={ //enum of valid values
 
 //*|| Toggle EventListeners
 onlyShowOnHoverEl.addEventListener('change', async ()=>{
-    let data=await chrome.storage.sync.get(); //get current settings
+    let data=await chrome.storage.local.get(); //get current settings
     data.settings.showCheckmarks=(onlyShowOnHoverEl.checked?showCheckmarksValues.onHover:showCheckmarksValues.always);
-    chrome.storage.sync.set(data);
+    chrome.storage.local.set(data);
 
     sendMessage({run: 'reload'}); //reloads when checking
 });
 
 overdueCollapsed.addEventListener('change', async ()=>{
-    let data=await chrome.storage.sync.get(); //get current settings
+    let data=await chrome.storage.local.get(); //get current settings
     data.settings.overdueCollapsed=!!overdueCollapsed.checked;
-    chrome.storage.sync.set(data);
+    chrome.storage.local.set(data);
 
     sendMessage({run: 'reload'}); //reloads when checking
 });
@@ -50,7 +50,7 @@ document.getElementById('copyDebugInfo').addEventListener('click', async ()=>{
 chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
     console.log('popup message', request);
     if (typeof request === 'object' && request?.type === 'debug-info') {
-        chrome.storage.sync.get('settings')
+        chrome.storage.local.get('settings')
             .then(({ settings })=>{
                 const version = settings.version;
                 console.log('Version', version, 'settings', settings);
@@ -81,7 +81,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
 
 //Uncheck All Assignments (reset) Button
 document.getElementById('resetBtn').addEventListener('click', async e=>{
-    chrome.storage.sync.set({courses: []});
+    chrome.storage.local.set({courses: []});
     sendMessage({run: 'reload'}); //reload page for changes to show
 });
 
